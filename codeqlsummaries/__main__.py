@@ -1,5 +1,6 @@
 
 import os
+import logging
 from argparse import ArgumentParser
 
 
@@ -24,7 +25,12 @@ parser_github.add_argument("--github-token", default=os.environ.get("GITHUB_TOKE
 
 if __name__ == "__main__":
     arguments = parser.parse_args()
-    
+
+    logging.basicConfig(
+        level=logging.DEBUG if arguments.debug else logging.INFO,
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    )
+
     # find db + language
     database = CodeQLDatabase("test", arguments.database, arguments.language)
 
