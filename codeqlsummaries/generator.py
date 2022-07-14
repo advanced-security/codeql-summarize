@@ -1,5 +1,3 @@
-
-
 # File from CodeQL GitHub repo
 # https://github.com/github/codeql/blob/main/misc/scripts/models-as-data/generate_flow_model.py
 
@@ -16,22 +14,27 @@ from codeqlsummaries.models import CodeQLDatabase, Summaries
 logger = logging.getLogger("codeqlsummaries.generator")
 
 
-QUERIES = {
-    "sinks": "CaptureSinkModels.ql"
-}
+QUERIES = {"sinks": "CaptureSinkModels.ql"}
+
 
 class Generator:
     CODEQL_LOCATION = "./codeql"
     CODEQL_REPO = "https://github.com/github/codeql.git"
 
-    def __init__ (self, database: CodeQLDatabase):
-        self.database = database 
+    def __init__(self, database: CodeQLDatabase):
+        self.database = database
         # working temp dir
         self.workDir = tempfile.mkdtemp()
-        
 
     def getCodeQLRepo(self):
-        cmd = ["git", "clone", "--depth", "1", Generator.CODEQL_REPO, Generator.CODEQL_LOCATION]
+        cmd = [
+            "git",
+            "clone",
+            "--depth",
+            "1",
+            Generator.CODEQL_REPO,
+            Generator.CODEQL_LOCATION,
+        ]
         with open(os.devnull, "w") as null:
             ret = subprocess.run(cmd, stdout=null)
             if ret != 0:
@@ -46,8 +49,18 @@ class Generator:
     def runQuery(self, query: str) -> Summaries:
         logger.info("Running Query :: " + query)
         resultBqrs = os.path.join(self.workDir, "out.bqrs")
-        cmd = ['codeql', 'query', 'run', query, '--database',
-               self.database, '--output', resultBqrs, '--threads', '8']
+        cmd = [
+            "codeql",
+            "query",
+            "run",
+            query,
+            "--database",
+            self.database,
+            "--output",
+            resultBqrs,
+            "--threads",
+            "8",
+        ]
 
         ret = subprocess.call(cmd)
         if ret != 0:
@@ -57,26 +70,33 @@ class Generator:
 
         return Summaries(rows)
 
-
     def readRows(self, bqrsFile):
         generatedJson = os.path.join(self.workDir, "out.json")
-        cmd = ['codeql', 'bqrs', 'decode', bqrsFile,
-               '--format=json', '--output', generatedJson]
+        cmd = [
+            "codeql",
+            "bqrs",
+            "decode",
+            bqrsFile,
+            "--format=json",
+            "--output",
+            generatedJson,
+        ]
         ret = subprocess.call(cmd)
         if ret != 0:
-            raise Exception("Failed to decode BQRS. Failed command was: " + shlex.join(cmd))
+            raise Exception(
+                "Failed to decode BQRS. Failed command was: " + shlex.join(cmd)
+            )
 
         with open(generatedJson) as f:
             results = json.load(f)
 
         try:
-            results['#select']['tuples']
+            results["#select"]["tuples"]
         except KeyError:
-            raise Exception('Unexpected JSON output - no tuples found')
+            raise Exception("Unexpected JSON output - no tuples found")
 
         rows = ""
-        for (row) in results['#select']['tuples']:
-            rows += "            \"" + row[0] + "\",\n"
+        for row in results["#select"]["tuples"]:
+            rows += '            "' + row[0] + '",\n'
 
         return rows[:-2]
-

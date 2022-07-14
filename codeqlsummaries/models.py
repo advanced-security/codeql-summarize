@@ -1,4 +1,3 @@
-
 import os
 from typing import *
 from dataclasses import *
@@ -18,7 +17,7 @@ class CodeQLDatabase:
     path: str
 
     language: str
-    
+
     summaries: Dict[str, Summaries] = field(default_factory=dict)
 
     def __post_init__(self):
@@ -28,8 +27,6 @@ class CodeQLDatabase:
         if self.language not in CODEQL_LANGUAGES:
             raise Exception("Language is not supported by CodeQL")
 
-    @property 
+    @property
     def target(self):
         return f"{self.name}.qll"
-
-
