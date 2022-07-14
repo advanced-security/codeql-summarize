@@ -33,9 +33,10 @@ if __name__ == "__main__":
 
     # generate models
     # https://github.com/github/codeql/blob/main/misc/scripts/models-as-data/generate_flow_model.py
-    query = generator.getModelGeneratorQuery("sinks")
+
     for name, query in QUERIES.items(): 
-        database.summaries[name] = generator.runQuery(query)
+        query_path = generator.getModelGeneratorQuery(query)
+        database.summaries[name] = generator.runQuery(query_path)
 
 
     # Export to Customizations.qll file / MaD YM 
