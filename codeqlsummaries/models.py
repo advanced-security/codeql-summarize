@@ -30,3 +30,8 @@ class CodeQLDatabase:
     @property
     def target(self):
         return f"{self.name}.qll"
+
+    def downloadDatabase(self, repository: str):
+        owner, repo = repository.split("/", 1)
+
+        raise Exception("Feature not built")

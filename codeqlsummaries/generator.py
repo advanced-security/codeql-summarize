@@ -8,17 +8,24 @@ import shlex
 import subprocess
 import tempfile
 import logging
+from typing import *
 
+from codeqlsummaries import __MODULE_PATH__
 from codeqlsummaries.models import CodeQLDatabase, Summaries
 
 logger = logging.getLogger("codeqlsummaries.generator")
 
 
-QUERIES = {"sinks": "CaptureSinkModels.ql"}
+# https://github.com/github/codeql/tree/main/java/ql/src/utils/model-generator
+QUERIES = {
+    "sinks": "CaptureSinkModels.ql",
+    "sources": "CaptureSourceModels.ql",
+    "taint": "CaptureSummaryModels.ql",
+}
 
 
 class Generator:
-    CODEQL_LOCATION = "./codeql"
+    CODEQL_LOCATION = os.path.realpath(os.path.join(__MODULE_PATH__, "..", "codeql"))
     CODEQL_REPO = "https://github.com/github/codeql.git"
 
     def __init__(self, database: CodeQLDatabase):
@@ -27,6 +34,9 @@ class Generator:
         self.workDir = tempfile.mkdtemp()
 
     def getCodeQLRepo(self):
+        if os.path.exists(Generator.CODEQL_LOCATION):
+            # TODO:TODO:  Update to latest?
+            return
         cmd = [
             "git",
             "clone",
@@ -41,10 +51,22 @@ class Generator:
                 raise Exception("Error getting CodeQL repo")
         return Generator
 
-    def getModelGeneratorQuery(self, name):
-        file = QUERIES.get(name)
-        # os.path.join?
-        return f"{Generator.CODEQL_LOCATION}/{self.database.language}/ql/src/utils/model-generator{file}"
+    def getModelGeneratorQuery(self, name) -> Optional[str]:
+        logger.info(f"Finding query name: {name}")
+        query_path = None
+        # Find in CodeQL
+        query_file = QUERIES.get(name)
+        
+        if query_file:
+            query_path = f"{Generator.CODEQL_LOCATION}/{self.database.language}/ql/src/utils/model-generator/{query_file}"
+            logger.debug(f"Query path :: {query_path}")
+            if os.path.exists(query_path):
+                return query_path
+
+        # Find in this repo 
+
+
+        return 
 
     def runQuery(self, query: str) -> Summaries:
         logger.info("Running Query :: " + query)
@@ -55,7 +77,7 @@ class Generator:
             "run",
             query,
             "--database",
-            self.database,
+            self.database.path,
             "--output",
             resultBqrs,
             "--threads",
@@ -71,6 +93,7 @@ class Generator:
         return Summaries(rows)
 
     def readRows(self, bqrsFile):
+        # //"package;type;overrides;name;signature;ext;spec;kind"
         generatedJson = os.path.join(self.workDir, "out.json")
         cmd = [
             "codeql",
@@ -95,8 +118,8 @@ class Generator:
         except KeyError:
             raise Exception("Unexpected JSON output - no tuples found")
 
-        rows = ""
-        for row in results["#select"]["tuples"]:
-            rows += '            "' + row[0] + '",\n'
+        rows = []
+        for tup in results["#select"]["tuples"]:
+            rows.extend(tup)
 
-        return rows[:-2]
+        return rows
