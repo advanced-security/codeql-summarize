@@ -1,0 +1,39 @@
+name: 'codeql-summary-generator'
+description: 'CodeQL Summary Generator'
+
+inputs:
+  database:
+    description: CodeQL Database
+    required: true
+
+  language:
+    description: CodeQL Database Language
+    required: true
+
+  token:
+    description: GitHub Personal Access Token
+    default: ${{ github.token }}
+
+  argvs:
+    description: 'Additional Arguments'
+
+
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      run: |
+        echo "::group::Installing Dependencies"
+        pushd ${{ github.action_path }}
+        python3 -m pip install pipenv && python3 -m pipenv install --system
+        popd
+        echo "::endgroup::"
+    - shell: bash
+      run: |
+        PYTHONPATH=${{ github.action_path }} && export PYTHONPATH=${{ github.action_path }}
+        python3 -m codeqlsummaries \
+          --database "${{ inputs.database }}" \
+          --language "${{ inputs.language }}"
+          --github-token "${{ inputs.token }}" \
+          --github-repository "${{ inputs.repository }}" \
+          ${{ inputs.argvs }}
