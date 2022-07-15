@@ -1,10 +1,11 @@
 import os
+import json
 import logging
 from argparse import ArgumentParser
 
 from codeqlsummaries import __MODULE_PATH__
 from codeqlsummaries.generator import Generator, QUERIES
-from codeqlsummaries.models import CodeQLDatabase, CODEQL_LANGUAGES
+from codeqlsummaries.models import CodeQLDatabase, GitHub, CODEQL_LANGUAGES
 from codeqlsummaries.exports import *
 
 logger = logging.getLogger("main")
@@ -22,6 +23,7 @@ parser.add_argument(
     default="customizations",
     help="Export format (`customizations`, `mad`, `bundle`)",
 )
+parser.add_argument("-i", "--input")
 parser.add_argument("-o", "--output")
 parser.add_argument("--working", default=os.getcwd())
 
@@ -45,39 +47,67 @@ if __name__ == "__main__":
         level=logging.DEBUG if arguments.debug else logging.INFO,
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     )
+    github = GitHub(
+       token=arguments.github_token 
+    ) 
+    databases = []
 
-    # find db + language
-    if not arguments.database:
-        raise Exception("Database not set")
+    # Check input file or manual
+    if arguments.input:
+        if not os.path.exists(arguments.input):
+            raise Exception("Input file is invalid")
+        with open(arguments.input, "w") as handle:
+            projects = json.load(handle)
+        logger.info(f"Loaded input / repo file :: {arguments.input}")
+        for lang, repos in projects.items():
+            for repo in repos:
+                db = CodeQLDatabase(repo, "", lang, repo)
+                logger.info(f"Downloading database for :: {repo}")
+                db.downloadDatabase(github, "./temp/db") 
+                # todo: download
+                databases.append(db)
+        
+        logger.info("Finished loading databases from input file")
 
-    database = CodeQLDatabase("test", arguments.database, arguments.language)
+    elif arguments.database and arguments.language:
+        # find local db + language
+        database = CodeQLDatabase("test", arguments.database, arguments.language)
+        databases.append(database)
 
-    logger.info(f"Database setup complete: {database}")
+        logger.info("Finished loading database from path")
 
-    # find codeql
-    generator = Generator(database)
+    else:
+        raise Exception("Database / Language not set")
 
-    # generate models
-    # https://github.com/github/codeql/blob/main/misc/scripts/models-as-data/generate_flow_model.py
+    logger.debug(f"Databases to process :: {len(databases)}")
 
-    for name, query in QUERIES.items():
-        query_path = generator.getModelGeneratorQuery(name)
+    for database in databases:
+        logger.info(f"Database setup complete: {database}")
 
-        database.summaries[name] = generator.runQuery(query_path)
+        # find codeql
+        generator = Generator(database)
 
-        # temp
-        for summary, data in database.summaries.items():
-            logger.info(f" Summary('{summary}', rows='{len(data.rows)}')")
+        # generate models
+        # https://github.com/github/codeql/blob/main/misc/scripts/models-as-data/generate_flow_model.py
 
-            with open("./test.txt", "w") as handle:
-                handle.writelines(data.rows)
+        for name, query in QUERIES.items():
+            query_path = generator.getModelGeneratorQuery(name)
+            if not query_path:
+                continue
+            database.summaries[name] = generator.runQuery(query_path)
 
-    # Export to Customizations.qll file / MaD YM
+            # temp
+            for summary, data in database.summaries.items():
+                logger.info(f" Summary('{summary}', rows='{len(data.rows)}')")
 
-    if not arguments.output:
-        raise Exception("Output not set")
-    exporter = EXPORTERS.get(arguments.format)
-    if not exporter:
-        raise Exception("Unknown or Unsupported exporter")
+                with open("./test.txt", "w") as handle:
+                    handle.writelines(data.rows)
 
-    exporter(database, arguments.output)
+        # Export to Customizations.qll file / MaD YM
+        if not arguments.output:
+            raise Exception("Output not set")
+        exporter = EXPORTERS.get(arguments.format)
+        if not exporter:
+            raise Exception("Unknown or Unsupported exporter")
+
+        exporter(database, arguments.output)
