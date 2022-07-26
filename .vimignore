@@ -1,5 +1,6 @@
 codeql/
 .codeql/
+testing/
 geekmasher-core
 
 

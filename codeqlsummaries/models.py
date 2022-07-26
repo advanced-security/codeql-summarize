@@ -1,5 +1,5 @@
 import os
-import tarfile
+import zipfile
 import logging
 from typing import *
 from dataclasses import *
@@ -29,9 +29,6 @@ class GitHub:
 
     def __post_init__(self):
         self.session = Session()
-        self.session.headers = {"Accept": "application/vnd.github.v3+json"}
-        if self.token:
-            self.session.headers.update(Authorization="token " + self.token)
 
 
 @dataclass
@@ -73,29 +70,35 @@ class CodeQLDatabase:
         """
         url = f"https://api.github.com/repos/{self.repository}/code-scanning/codeql/databases/{self.language}"
 
-        resp = self.session.get(url)
-        if resp.status_code != 200:
-            logger.warning("Failed to download CodeQL Database")
-            logger.warning("Access control or missing database on GitHub instance")
-            return ""
+        if not github or not github.token:
+            raise Exception("Failed to download due to authorization")
 
-        self.session.headers.update(Accept="application/zip")
+        headers = {
+            "Accept": "application/zip",
+            "Authorization": f"token {github.token}",
+        }
 
         output_zip = os.path.join(output, self.database_folder + ".tar.gz")
         output_db = os.path.join(output, self.database_folder)
+        
+        if not os.path.exists(output_zip):
+            logger.info("Downloading CodeQL Database from GitHub")
+            with github.session.get(url, headers=headers, stream=True, allow_redirects=True) as r:
+                r.raise_for_status()
+                with open(output_zip, "wb") as f:
+                    for chunk in r.iter_content(chunk_size=8192):
+                        # If you have chunk encoded response uncomment if
+                        # and set chunk_size parameter to None.
+                        # if chunk:
+                        f.write(chunk)
+        else:
+            logger.info("Database archive is present on system, skipping download...")
 
-        with github.session.get(url, stream=True) as r:
-            r.raise_for_status()
-            with open(output_zip, "wb") as f:
-                for chunk in r.iter_content(chunk_size=8192):
-                    # If you have chunk encoded response uncomment if
-                    # and set chunk_size parameter to None.
-                    # if chunk:
-                    f.write(chunk)
-
-        tar = tarfile.open(output_zip)
+        logger.info(f"Extracting archive data :: {output_zip}")
+        
         # SECURITY: Do we trust this DB?
-        tar.extractall(output_db)
+        with zipfile.ZipFile(output_zip) as zf:
+            zf.extractall(output_db)
 
         return output_db
 
