@@ -10,7 +10,7 @@ from codeqlsummaries.exports import *
 
 logger = logging.getLogger("main")
 
-EXPORTERS = {"json": exportToJson}
+EXPORTERS = {"json": exportToJson, "customizations": exportCustomizations}
 
 parser = ArgumentParser("codeqlsummaries", "CodeQL Summary Generator")
 parser.add_argument(
@@ -24,7 +24,7 @@ parser.add_argument(
     help="Export format (`customizations`, `mad`, `bundle`)",
 )
 parser.add_argument("-i", "--input")
-parser.add_argument("-o", "--output")
+parser.add_argument("-o", "--output", default=os.getcwd())
 parser.add_argument("--working", default=os.getcwd())
 
 parser_codeql = parser.add_argument_group("CodeQL")
@@ -40,6 +40,9 @@ parser_github.add_argument(
 )
 parser_github.add_argument("--github-token", default=os.environ.get("GITHUB_TOKEN"))
 
+
+
+
 if __name__ == "__main__":
     arguments = parser.parse_args()
 
@@ -47,26 +50,45 @@ if __name__ == "__main__":
         level=logging.DEBUG if arguments.debug else logging.INFO,
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     )
-    github = GitHub(
-       token=arguments.github_token 
-    ) 
-    databases = []
 
+    github = None
+
+    if arguments.repository:
+        owner, repo = arguments.repository.split("/", 1)
+        logger.info(f"GitHub repo present - Owner: {owner}, Repository: {repo}")
+        github = GitHub(
+            owner=owner,
+            repo=repo,
+            token=arguments.github_token
+        )
+    if arguments.output:
+        os.makedirs(arguments.output, exist_ok=True)
+
+    databases = []
+ 
     # Check input file or manual
     if arguments.input:
         if not os.path.exists(arguments.input):
             raise Exception("Input file is invalid")
-        with open(arguments.input, "w") as handle:
+        with open(arguments.input, "r") as handle:
             projects = json.load(handle)
         logger.info(f"Loaded input / repo file :: {arguments.input}")
         for lang, repos in projects.items():
             for repo in repos:
-                db = CodeQLDatabase(repo, "", lang, repo)
-                logger.info(f"Downloading database for :: {repo}")
-                db.downloadDatabase(github, "./temp/db") 
-                # todo: download
+                db = CodeQLDatabase(
+                    name=repo,
+                    language=lang,
+                    repository=repo
+                )
+                if github and db.repository:
+                    logger.info(f"Downloading database for :: {repo}")
+                    db.downloadDatabase(
+                        github,
+                        arguments.output
+                    )
+
                 databases.append(db)
-        
+
         logger.info("Finished loading databases from input file")
 
     elif arguments.database and arguments.language:
@@ -83,6 +105,9 @@ if __name__ == "__main__":
 
     for database in databases:
         logger.info(f"Database setup complete: {database}")
+        
+        if not database.exists():
+            raise Exception("CodeQL Database does not exist...")
 
         # find codeql
         generator = Generator(database)
@@ -110,4 +135,9 @@ if __name__ == "__main__":
         if not exporter:
             raise Exception("Unknown or Unsupported exporter")
 
-        exporter(database, arguments.output)
+        exporter(
+            database,
+            arguments.output,
+            github=github
+        )
+

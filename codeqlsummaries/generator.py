@@ -18,9 +18,9 @@ logger = logging.getLogger("codeqlsummaries.generator")
 
 # https://github.com/github/codeql/tree/main/java/ql/src/utils/model-generator
 QUERIES = {
-    "sinks": "CaptureSinkModels.ql",
-    "sources": "CaptureSourceModels.ql",
-    "taint": "CaptureSummaryModels.ql",
+    "SinkModel": "CaptureSinkModels.ql",
+    "SourceModel": "CaptureSourceModels.ql",
+    "SummaryModel": "CaptureSummaryModels.ql",
 }
 
 
@@ -56,17 +56,16 @@ class Generator:
         query_path = None
         # Find in CodeQL
         query_file = QUERIES.get(name)
-        
+
         if query_file:
             query_path = f"{Generator.CODEQL_LOCATION}/{self.database.language}/ql/src/utils/model-generator/{query_file}"
             logger.debug(f"Query path :: {query_path}")
             if os.path.exists(query_path):
                 return query_path
 
-        # Find in this repo 
+        # Find in this repo
 
-
-        return 
+        return
 
     def runQuery(self, query: str) -> Summaries:
         logger.info("Running Query :: " + query)

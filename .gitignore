@@ -3,6 +3,16 @@ temp/
 testing/
 codeql/
 .build.json
+test.*
+
+
+cpp/
+csharp/
+java/
+javascript/
+python/
+go/
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
