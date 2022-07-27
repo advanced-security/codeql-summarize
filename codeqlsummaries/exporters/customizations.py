@@ -9,22 +9,6 @@ from codeqlsummaries.models import CodeQLDatabase, GitHub
 logger = logging.getLogger("codeqlsummaries.exporters")
 
 
-def exportToJson(database: CodeQLDatabase, output: str, **kargs):
-    logger.info("Running export to JSON")
-    output_file = os.path.join(output, "codeql.json")
-
-    data = {}
-    for name, summary in database.summaries.items():
-        data[name] = summary.rows
-
-    with open(output_file, "w") as handle:
-        json.dump(data, handle, indent=2, sort_keys=True)
-
-    logger.info("Completed writing to output")
-
-    return
-
-
 CODEQL_LIBRARY = """\
 import {language}
 private import semmle.code.{language}.dataflow.ExternalFlow
@@ -120,23 +104,27 @@ module {owner} {{
 
 def exportBundle(database: CodeQLDatabase, output: str, github: GitHub = None, **kargs):
     working = kargs.get("working", os.getcwd())
+    logger.debug(f"Working dir :: {working}")
     if not github or not github.owner:
         raise Exception("Failed to export Bundle: No owner / repo name set")
 
     # Create root for language
     root = os.path.join(working, database.language, github.owner)
     os.makedirs(root, exist_ok=True)
+    logger.debug(f"Root for language :: {root}")
 
     # Create language files
     codeql_lang_lock = os.path.join(root, "codeql-pack.lock.yml")
     if not os.path.exists(codeql_lang_lock):
+        logger.debug(f"Creating Language Lock file :: {codeql_lang_lock}")
         with open(codeql_lang_lock, "w") as handle:
             handle.write(
                 CODEQL_LOCK.format(language=database.language)
-            )    
+            )
     
     codeql_lang_pack = os.path.join(root, "qlpack.yml")
     if not os.path.exists(codeql_lang_pack):
+        logger.debug(f"Creating Language Pack file :: {codeql_lang_pack}")
         with open(codeql_lang_pack, "w") as handle:
             handle.write(
                 CODEQL_PACK.format(

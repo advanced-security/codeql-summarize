@@ -5,12 +5,11 @@ from argparse import ArgumentParser
 
 from codeqlsummaries import __MODULE_PATH__
 from codeqlsummaries.generator import Generator, QUERIES
-from codeqlsummaries.models import CodeQLDatabase, GitHub, CODEQL_LANGUAGES
-from codeqlsummaries.exports import *
+from codeqlsummaries.models import CodeQLDatabase, GitHub
+from codeqlsummaries.exporters import EXPORTERS
 
 logger = logging.getLogger("main")
 
-EXPORTERS = {"json": exportToJson, "customizations": exportCustomizations, "bundle": exportBundle}
 
 parser = ArgumentParser("codeqlsummaries", "CodeQL Summary Generator")
 parser.add_argument(

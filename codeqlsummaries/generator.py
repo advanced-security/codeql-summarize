@@ -35,7 +35,7 @@ class Generator:
 
     def getCodeQLRepo(self):
         if os.path.exists(Generator.CODEQL_LOCATION):
-            # TODO:TODO:  Update to latest?
+            # TODO: Update to latest?
             return
         cmd = [
             "git",
