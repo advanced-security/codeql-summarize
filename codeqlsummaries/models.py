@@ -49,7 +49,7 @@ class CodeQLDatabase:
             raise Exception("Database folder incorrect")
         
         if self.language not in CODEQL_LANGUAGES:
-            raise Exception("Language is not supported by CodeQL")
+            raise Exception("Language is not supported by CodeQL Summary Generator")
 
     def exists(self) -> bool:
         return False if not self.path else os.path.exists(self.path)
