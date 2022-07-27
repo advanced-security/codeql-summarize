@@ -4,7 +4,7 @@ testing/
 codeql/
 .build.json
 test.*
-
+*.tar*
 
 cpp/
 csharp/

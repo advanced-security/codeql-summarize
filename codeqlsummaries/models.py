@@ -55,6 +55,11 @@ class CodeQLDatabase:
         return False if not self.path else os.path.exists(self.path)
 
     @property
+    def display_name(self):
+        new_name = self.name.replace("-", " ")
+        return new_name.title().replace(" ", "")
+
+    @property
     def target(self):
         return f"{self.name}.qll"
 
@@ -100,5 +105,5 @@ class CodeQLDatabase:
         with zipfile.ZipFile(output_zip) as zf:
             zf.extractall(output_db)
 
-        return output_db
+        return os.path.join(output_db, self.language)
 

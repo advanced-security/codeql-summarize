@@ -10,7 +10,7 @@ from codeqlsummaries.exports import *
 
 logger = logging.getLogger("main")
 
-EXPORTERS = {"json": exportToJson, "customizations": exportCustomizations}
+EXPORTERS = {"json": exportToJson, "customizations": exportCustomizations, "bundle": exportBundle}
 
 parser = ArgumentParser("codeqlsummaries", "CodeQL Summary Generator")
 parser.add_argument(
@@ -75,17 +75,19 @@ if __name__ == "__main__":
         logger.info(f"Loaded input / repo file :: {arguments.input}")
         for lang, repos in projects.items():
             for repo in repos:
+                _, name = repo.split("/")
                 db = CodeQLDatabase(
-                    name=repo,
+                    name=name,
                     language=lang,
                     repository=repo
                 )
                 if github and db.repository:
                     logger.info(f"Downloading database for :: {repo}")
-                    db.downloadDatabase(
+                    download_path = db.downloadDatabase(
                         github,
                         arguments.output
                     )
+                    db.path = download_path
 
                 databases.append(db)
 
@@ -138,6 +140,7 @@ if __name__ == "__main__":
         exporter(
             database,
             arguments.output,
-            github=github
+            github=github,
+            working=arguments.working
         )
 
