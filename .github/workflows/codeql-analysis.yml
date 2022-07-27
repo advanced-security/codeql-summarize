@@ -32,7 +32,7 @@ jobs:
       uses: github/codeql-action/init@v2
       with:
         languages: ${{ matrix.language }}
-        queries: advanced-security/codeql-queries/config/config-local.yml@main
+        config-file: advanced-security/codeql-queries/config/config-local.yml@main
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
