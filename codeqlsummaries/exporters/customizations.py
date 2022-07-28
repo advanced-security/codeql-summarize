@@ -4,7 +4,7 @@ import logging
 from dataclasses import asdict
 
 from codeqlsummaries.models import CodeQLDatabase, GitHub
-
+from codeqlsummaries.generator import QUERIES
 
 logger = logging.getLogger("codeqlsummaries.exporters")
 
@@ -35,6 +35,9 @@ def saveQLL(
     padding = " " * 6
 
     models = {}
+    # initially populate data
+    for key in QUERIES.keys():
+        models[key] = "// NOT SET"
 
     for sname, summary in database.summaries.items():
         rows = ""
@@ -56,6 +59,8 @@ def saveQLL(
         )
 
         models[sname] = custom
+
+    logger.debug(f"List of models: {models.keys()}")
 
     # Generate Customizations.qll
     data = CODEQL_LIBRARY.format(language=database.language, **models)
