@@ -85,8 +85,22 @@ if __name__ == "__main__":
         os.makedirs(arguments.output, exist_ok=True)
     else:
         raise Exception("Output is not set")
-    # Check input file or manual
-    if arguments.input and os.path.exists(arguments.input):
+    
+    # If scan repo settings are present
+    if github and arguments.project_repo and arguments.language:
+        logger.info(f"Analysing remote repo: {arguments.project_repo} ({arguments.language})")
+        _, repo = arguments.project_repo.split("/", 1)
+        database = CodeQLDatabase(
+            repo,
+            language=arguments.language,
+            repository=arguments.project_repo
+        )
+        database.path = database.downloadDatabase(github, temppath)
+
+        databases.append(database)
+
+    # If a project file is present
+    elif arguments.input and os.path.exists(arguments.input):
         """Input file is a `projects.json` file"""
         logger.info(f"Loaded input / projects file :: {arguments.input}")
 
@@ -116,18 +130,6 @@ if __name__ == "__main__":
                 databases.append(db)
 
         logger.info("Finished loading databases from input file")
-
-    elif github and arguments.project_repo and arguments.language:
-        logger.info(f"Analysing remote repo: {arguments.project_repo} ({arguments.language})")
-        _, repo = arguments.project_repo.split("/", 1)
-        database = CodeQLDatabase(
-            repo,
-            language=arguments.language,
-            repository=arguments.project_repo
-        )
-        database.path = database.downloadDatabase(github, temppath)
-
-        databases.append(database)
 
     elif arguments.database and arguments.language:
         # find local db + language
