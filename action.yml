@@ -34,8 +34,9 @@ runs:
       run: |
         PYTHONPATH=${{ github.action_path }} && export PYTHONPATH=${{ github.action_path }}
         python3 -m codeqlsummaries \
-          --input "${{ inputs.projects }}"
-          --mode "${{ inputs.mode }}" 
+          --input "${{ inputs.projects }}" \
+          --mode "${{ inputs.mode }}" \ 
           --github-token "${{ inputs.token }}" \
           --github-repository "${{ inputs.repository }}" \
           ${{ inputs.argvs }}
+
