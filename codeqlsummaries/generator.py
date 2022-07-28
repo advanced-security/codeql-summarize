@@ -28,6 +28,8 @@ class Generator:
     CODEQL_LOCATION = os.path.realpath(os.path.join(__MODULE_PATH__, "..", "codeql"))
     CODEQL_REPO = "https://github.com/github/codeql.git"
 
+    TEMP_PATH = os.path.join(tempfile.gettempdir(), "codeqlsummaries")
+
     def __init__(self, database: CodeQLDatabase):
         self.database = database
         # working temp dir
@@ -69,7 +71,7 @@ class Generator:
 
     def runQuery(self, query: str) -> Summaries:
         logger.info("Running Query :: " + query)
-        resultBqrs = os.path.join(self.workDir, "out.bqrs")
+        resultBqrs = os.path.join(Generator.TEMP_PATH, "out.bqrs")
         cmd = [
             "codeql",
             "query",
@@ -93,7 +95,7 @@ class Generator:
 
     def readRows(self, bqrsFile):
         # //"package;type;overrides;name;signature;ext;spec;kind"
-        generatedJson = os.path.join(self.workDir, "out.json")
+        generatedJson = os.path.join(Generator.TEMP_PATH, "out.json")
         cmd = [
             "codeql",
             "bqrs",

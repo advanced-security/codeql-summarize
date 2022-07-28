@@ -3,20 +3,16 @@ description: 'CodeQL Summary Generator'
 
 inputs:
   projects:
-    description: Project File with projects
+    description: "Project File with projects"
     default: ./projects.json
 
   format:
-    description: Exporting Format (default: bundle)
+    description: "Exporting Format (default: bundle)"
     default: bundle
 
   token:
-    description: GitHub Personal Access Token
+    description: "GitHub Personal Access Token"
     default: ${{ github.token }}
-
-  argvs:
-    description: 'Additional Arguments'
-
 
 runs:
   using: "composite"
@@ -37,5 +33,5 @@ runs:
           --input "${{ inputs.projects }}" \
           --format "${{ inputs.format }}" \ 
           --github-token "${{ inputs.token }}" \
-          --github-repository "${{ inputs.repository }}" \
-          ${{ inputs.argvs }}
+          --github-repository "${{ inputs.repository }}"
+
