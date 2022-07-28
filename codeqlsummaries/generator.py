@@ -50,7 +50,7 @@ class Generator:
             Generator.CODEQL_LOCATION,
         ]
         with open(os.devnull, "w") as null:
-            ret = subprocess.run(cmd, stdout=null, stderr=null)
+            ret = subprocess.call(cmd, stdout=null, stderr=null)
             if ret != 0:
                 raise Exception("Error getting CodeQL repo")
         return Generator
