@@ -31,7 +31,7 @@ class Generator:
     def __init__(self, database: CodeQLDatabase):
         self.database = database
         # working temp dir
-        self.workDir = tempfile.mkdtemp()
+
 
     def getCodeQLRepo(self):
         if os.path.exists(Generator.CODEQL_LOCATION):

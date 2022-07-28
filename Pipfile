@@ -7,6 +7,15 @@ name = "pypi"
 requests = "*"
 
 [dev-packages]
+black = "*"
+pyright = "*"
 
 [requires]
 python_version = "3.9"
+
+[scripts]
+lint = "black ."
+format = "black ."
+test = "pyright ./codeqlsummaries"
+
+

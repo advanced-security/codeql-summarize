@@ -1,6 +1,7 @@
 import os
 import json
 import logging
+import tempfile
 from argparse import ArgumentParser
 
 from codeqlsummaries import __MODULE_PATH__
@@ -40,10 +41,13 @@ parser_github.add_argument(
 parser_github.add_argument("--github-token", default=os.environ.get("GITHUB_TOKEN"))
 
 
-
-
 if __name__ == "__main__":
     arguments = parser.parse_args()
+
+    github = None
+    databases = []
+
+    temppath = os.path.join(tempfile.gettempdir(), "codeqlsummaries")
 
     logging.basicConfig(
         level=logging.DEBUG if arguments.debug else logging.INFO,
@@ -51,45 +55,42 @@ if __name__ == "__main__":
     )
     logger.debug("Debugging is enabled")
 
-    github = None
+    if not arguments.format:
+        raise Exception("Format flag is not set")
 
     if arguments.repository:
         owner, repo = arguments.repository.split("/", 1)
         logger.info(f"GitHub repo present - Owner: {owner}, Repository: {repo}")
 
-        github = GitHub(
-            owner=owner,
-            repo=repo,
-            token=arguments.github_token
-        )
+        github = GitHub(owner=owner, repo=repo, token=arguments.github_token)
 
     if arguments.output:
         logger.debug(f"Creating output dir :: {arguments.output}")
         os.makedirs(arguments.output, exist_ok=True)
+    else:
+        raise Exception("Output is not set")
 
-    databases = []
- 
     # Check input file or manual
     if arguments.input:
+        """Input file is a `projects.json` file"""
+        logger.info(f"Loaded input / projects file :: {arguments.input}")
+
         if not os.path.exists(arguments.input):
             raise Exception("Input file is invalid")
         with open(arguments.input, "r") as handle:
             projects = json.load(handle)
-        logger.info(f"Loaded input / repo file :: {arguments.input}")
+
         for lang, repos in projects.items():
             for repo in repos:
                 _, name = repo.split("/")
-                db = CodeQLDatabase(
-                    name=name,
-                    language=lang,
-                    repository=repo
-                )
+                
+                db = CodeQLDatabase(name=name, language=lang, repository=repo)
+
                 if github and db.repository:
                     logger.info(f"Downloading database for :: {repo}")
-                    download_path = db.downloadDatabase(
-                        github,
-                        arguments.output
-                    )
+
+                    download_path = db.downloadDatabase(github, temppath)
+
                     db.path = download_path
 
                 databases.append(db)
@@ -107,11 +108,10 @@ if __name__ == "__main__":
         raise Exception("Database / Language not set")
 
     logger.info(f"Databases to process :: {len(databases)}")
-    
 
     for database in databases:
         logger.info(f"Database setup complete: {database}")
-        
+
         if not database.exists():
             raise Exception("CodeQL Database does not exist...")
 
@@ -134,17 +134,10 @@ if __name__ == "__main__":
                 with open("./test.txt", "w") as handle:
                     handle.writelines(data.rows)
 
-        # Export to Customizations.qll file / MaD YM
-        if not arguments.output:
-            raise Exception("Output not set")
+        logger.info(f"Running exporter :: {arguments.format}")
+
         exporter = EXPORTERS.get(arguments.format)
         if not exporter:
             raise Exception("Unknown or Unsupported exporter")
 
-        exporter(
-            database,
-            arguments.output,
-            github=github,
-            working=arguments.working
-        )
-
+        exporter(database, arguments.output, github=github, working=arguments.working)

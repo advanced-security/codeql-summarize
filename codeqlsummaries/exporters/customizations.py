@@ -29,7 +29,9 @@ private class {name}{type}Custom extends {models} {{
 """
 
 
-def saveQLL(database: CodeQLDatabase, output_customizations: str, github: GitHub = None, **kargs):
+def saveQLL(
+    database: CodeQLDatabase, output_customizations: str, github: GitHub = None, **kargs
+):
     padding = " " * 6
 
     models = {}
@@ -57,15 +59,16 @@ def saveQLL(database: CodeQLDatabase, output_customizations: str, github: GitHub
 
     # Generate Customizations.qll
     data = CODEQL_LIBRARY.format(language=database.language, **models)
-    
+
     with open(output_customizations, "w") as handle:
         handle.write(data)
-    
+
     return
 
 
-
-def exportCustomizations(database: CodeQLDatabase, output: str, github: GitHub = None, **kargs):
+def exportCustomizations(
+    database: CodeQLDatabase, output: str, github: GitHub = None, **kargs
+):
     logger.info(f"Running export customizations")
 
     path = os.path.join(output, "Customizations.qll")
@@ -73,7 +76,6 @@ def exportCustomizations(database: CodeQLDatabase, output: str, github: GitHub =
     saveQLL(database, path, github, **kargs)
 
     return
-
 
 
 CODEQL_LOCK = """\
@@ -102,6 +104,7 @@ module {owner} {{
 }}
 """
 
+
 def exportBundle(database: CodeQLDatabase, output: str, github: GitHub = None, **kargs):
     working = kargs.get("working", os.getcwd())
     logger.debug(f"Working dir :: {working}")
@@ -118,49 +121,44 @@ def exportBundle(database: CodeQLDatabase, output: str, github: GitHub = None, *
     if not os.path.exists(codeql_lang_lock):
         logger.debug(f"Creating Language Lock file :: {codeql_lang_lock}")
         with open(codeql_lang_lock, "w") as handle:
-            handle.write(
-                CODEQL_LOCK.format(language=database.language)
-            )
-    
+            handle.write(CODEQL_LOCK.format(language=database.language))
+
     codeql_lang_pack = os.path.join(root, "qlpack.yml")
     if not os.path.exists(codeql_lang_pack):
         logger.debug(f"Creating Language Pack file :: {codeql_lang_pack}")
         with open(codeql_lang_pack, "w") as handle:
             handle.write(
                 CODEQL_PACK.format(
-                    owner=github.owner,
-                    version="0.1.0",
-                    language=database.language
+                    owner=github.owner, version="0.1.0", language=database.language
                 )
-            )    
+            )
 
     # Create language subfolder (if needed)
     sub = os.path.join(root, github.owner, database.language)
     os.makedirs(sub, exist_ok=True)
 
-    
     name = database.display_name + "Generated"
 
     db_custom_lib_path = os.path.join(sub, name + ".qll")
     saveQLL(database, db_custom_lib_path, github)
-    
 
     # Dynamically update Customizations.qll
     customizations_path = os.path.join(sub, "Customizations.qll")
     customizations_data = ""
     for custom in os.listdir(sub):
-        if custom == "Customizations.qll": continue
+        if custom == "Customizations.qll":
+            continue
 
         impt = f"    private import {github.owner}.{database.language}.{name}\n"
         customizations_data += impt
 
     with open(customizations_path, "w") as handle:
-        handle.write(CODEQL_CUSTOMIZATIONS_QLL.format(
-            language=database.language,
-            custom=customizations_data,
-            owner=github.owner
-        ))
+        handle.write(
+            CODEQL_CUSTOMIZATIONS_QLL.format(
+                language=database.language,
+                custom=customizations_data,
+                owner=github.owner,
+            )
+        )
 
     return
-
-

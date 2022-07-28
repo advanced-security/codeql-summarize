@@ -47,14 +47,12 @@ class CodeQLDatabase:
     token: Optional[str] = None
     summaries: Dict[str, Summaries] = field(default_factory=dict)
 
-    tmp: ClassVar[str] = tempfile.gettempdir()
-
     session: Session = Session()
 
     def __post_init__(self):
         if self.path and not os.path.exists(self.path):
             raise Exception("Database folder incorrect")
-       
+
         if self.language not in CODEQL_LANGUAGES:
             raise Exception("Language is not supported by CodeQL Summary Generator")
 
@@ -76,10 +74,9 @@ class CodeQLDatabase:
             return self.repository.replace("/", "_")
         # TODO
         return "temp_db"
-            
+
     def downloadDatabase(self, github: GitHub, output: str) -> str:
-        """ Download CodeQL database
-        """
+        """Download CodeQL database"""
         url = f"{GitHub.endpoint}/repos/{self.repository}/code-scanning/codeql/databases/{self.language}"
         logger.debug(f"Endpoint to Download Database :: {url}")
 
@@ -95,10 +92,12 @@ class CodeQLDatabase:
 
         output_zip = os.path.join(output, self.database_folder + ".tar.gz")
         output_db = os.path.join(output, self.database_folder)
-        
+
         if not os.path.exists(output_zip):
             logger.info("Downloading CodeQL Database from GitHub")
-            with github.session.get(url, headers=headers, stream=True, allow_redirects=True) as r:
+            with github.session.get(
+                url, headers=headers, stream=True, allow_redirects=True
+            ) as r:
                 r.raise_for_status()
                 with open(output_zip, "wb") as f:
                     for chunk in r.iter_content(chunk_size=8192):
@@ -110,10 +109,9 @@ class CodeQLDatabase:
             logger.info("Database archive is present on system, skipping download...")
 
         logger.info(f"Extracting archive data :: {output_zip}")
-        
+
         # SECURITY: Do we trust this DB?
         with zipfile.ZipFile(output_zip) as zf:
             zf.extractall(output_db)
 
         return os.path.join(output_db, self.language)
-
