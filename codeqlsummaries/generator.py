@@ -4,6 +4,7 @@
 import json
 import os
 import os.path
+import glob
 import shlex
 import subprocess
 import tempfile
@@ -30,9 +31,12 @@ class Generator:
 
     TEMP_PATH = os.path.join(tempfile.gettempdir(), "codeqlsummaries")
 
+    codeql_cli: Optional[str] = None
+
     def __init__(self, database: CodeQLDatabase):
         self.database = database
-        # working temp dir
+
+        self.codeql_cli = self.findCodeQLCli()
 
     @staticmethod
     def getCodeQLRepo():
@@ -54,6 +58,23 @@ class Generator:
             if ret != 0:
                 raise Exception("Error getting CodeQL repo")
         return Generator
+
+    def findCodeQLCli(self) -> str:
+        actions = glob.glob(
+            os.path.join(
+                os.environ.get("RUNNER_TOOL_CACHE", ""),
+                "CodeQL",
+                "*",
+                "x64",
+                "codeql",
+                "codeql" + ("" if os.name == "posix" else ".exe"),
+            )
+        )
+        if len(actions) != 0:
+            logger.debug(f"CodeQL found on Actions :: {actions[0]}")
+            return actions[0]
+        logger.debug(f"Use CodeQL default")
+        return "codeql"
 
     def getModelGeneratorQuery(self, name) -> Optional[str]:
         logger.info(f"Finding query name: {name}")
