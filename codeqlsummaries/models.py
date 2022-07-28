@@ -93,6 +93,9 @@ class CodeQLDatabase:
             "Authorization": f"token {github.token}",
         }
 
+        if not os.path.exists(output):
+            raise Exception(f"Output / Temp path does not exist: {output}")
+
         output_zip = os.path.join(output, self.database_folder + ".tar.gz")
         output_db = os.path.join(output, self.database_folder)
 
