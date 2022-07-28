@@ -2,13 +2,13 @@ name: 'codeql-summary-generator'
 description: 'CodeQL Summary Generator'
 
 inputs:
-  database:
-    description: CodeQL Database
-    required: true
+  projects:
+    description: Project File with projects
+    default: ./projects.json
 
-  language:
-    description: CodeQL Database Language
-    required: true
+  mode:
+    description: Mode
+    default: bundle
 
   token:
     description: GitHub Personal Access Token
@@ -28,12 +28,14 @@ runs:
         python3 -m pip install pipenv && python3 -m pipenv install --system
         popd
         echo "::endgroup::"
+
+    # -i ./testing/codeql-bundle/projects.json -f bundle --working ./testing/codeql-bundle
     - shell: bash
       run: |
         PYTHONPATH=${{ github.action_path }} && export PYTHONPATH=${{ github.action_path }}
         python3 -m codeqlsummaries \
-          --database "${{ inputs.database }}" \
-          --language "${{ inputs.language }}"
+          --input "${{ inputs.projects }}"
+          --mode "${{ inputs.mode }}" 
           --github-token "${{ inputs.token }}" \
           --github-repository "${{ inputs.repository }}" \
           ${{ inputs.argvs }}
