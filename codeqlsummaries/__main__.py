@@ -50,7 +50,10 @@ if __name__ == "__main__":
     github = None
     databases = []
 
-    temppath = os.path.join(tempfile.gettempdir(), "codeqlsummaries")
+    # Support for Actions temp dirs
+    temppath = os.path.join(
+        os.environ.get("RUNNER_TEMP", tempfile.gettempdir()), "codeqlsummaries"
+    )
 
     logging.basicConfig(
         level=logging.DEBUG if arguments.debug else logging.INFO,
