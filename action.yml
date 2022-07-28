@@ -10,6 +10,10 @@ inputs:
     description: "Exporting Format (default: bundle)"
     default: bundle
 
+  repository:
+    description: "GitHub Repository"
+    default: ${{ github.repository }}
+
   token:
     description: "GitHub Personal Access Token"
     default: ${{ github.token }}

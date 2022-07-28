@@ -66,6 +66,7 @@ if __name__ == "__main__":
 
         github = GitHub(owner=owner, repo=repo, token=arguments.github_token)
 
+
     if arguments.output:
         logger.debug(f"Creating output dir :: {arguments.output}")
         os.makedirs(arguments.output, exist_ok=True)
@@ -94,6 +95,9 @@ if __name__ == "__main__":
                     download_path = db.downloadDatabase(github, temppath)
 
                     db.path = download_path
+                
+                if not db.path:
+                    logger.warning(f"CodeQL Database path is not set")
 
                 databases.append(db)
 
