@@ -49,6 +49,7 @@ if __name__ == "__main__":
         level=logging.DEBUG if arguments.debug else logging.INFO,
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     )
+    logger.debug("Debugging is enabled")
 
     github = None
 

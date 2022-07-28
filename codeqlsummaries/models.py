@@ -79,6 +79,8 @@ class CodeQLDatabase:
         url = f"https://api.github.com/repos/{self.repository}/code-scanning/codeql/databases/{self.language}"
 
         if not github or not github.token:
+            logger.error("GitHub or GitHub Token isn't valid...")
+            logger.debug(github)
             raise Exception("Failed to download due to authorization")
 
         headers = {
