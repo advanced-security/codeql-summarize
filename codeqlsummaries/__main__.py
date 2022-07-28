@@ -58,6 +58,9 @@ if __name__ == "__main__":
     if not arguments.format:
         raise Exception("Format flag is not set")
 
+    if not EXPORTERS.get(arguments.format):
+        raise Exception(f"Format mode provided isn't valid: {arguments.format}")
+
     if arguments.repository:
         owner, repo = arguments.repository.split("/", 1)
         logger.info(f"GitHub repo present - Owner: {owner}, Repository: {repo}")

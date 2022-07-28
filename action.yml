@@ -6,8 +6,8 @@ inputs:
     description: Project File with projects
     default: ./projects.json
 
-  mode:
-    description: Mode
+  format:
+    description: Exporting Format (default: bundle)
     default: bundle
 
   token:
@@ -35,8 +35,7 @@ runs:
         PYTHONPATH=${{ github.action_path }} && export PYTHONPATH=${{ github.action_path }}
         python3 -m codeqlsummaries \
           --input "${{ inputs.projects }}" \
-          --mode "${{ inputs.mode }}" \ 
+          --format "${{ inputs.format }}" \ 
           --github-token "${{ inputs.token }}" \
           --github-repository "${{ inputs.repository }}" \
           ${{ inputs.argvs }}
-
