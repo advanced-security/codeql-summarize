@@ -96,7 +96,7 @@ class Generator:
         output_std = os.path.join(Generator.TEMP_PATH, "runquery.txt")
 
         cmd = [
-            "codeql",
+            self.codeql_cli,
             "query",
             "run",
             query,
@@ -125,7 +125,7 @@ class Generator:
         output_std = os.path.join(Generator.TEMP_PATH, "rows.txt")
 
         cmd = [
-            "codeql",
+            self.codeql_cli,
             "bqrs",
             "decode",
             bqrsFile,
