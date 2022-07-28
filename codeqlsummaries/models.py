@@ -30,6 +30,10 @@ class GitHub:
 
     def __post_init__(self):
         self.session = Session()
+        if not self.token:
+            logger.warning("GitHub Token is not set, API access will be unavailable")
+        else:
+            logger.debug(f"GitHub Token is set :: {self.token[:8]}")
 
 
 @dataclass
@@ -76,7 +80,8 @@ class CodeQLDatabase:
     def downloadDatabase(self, github: GitHub, output: str) -> str:
         """ Download CodeQL database
         """
-        url = f"https://api.github.com/repos/{self.repository}/code-scanning/codeql/databases/{self.language}"
+        url = f"{GitHub.endpoint}/repos/{self.repository}/code-scanning/codeql/databases/{self.language}"
+        logger.debug(f"Endpoint to Download Database :: {url}")
 
         if not github or not github.token:
             logger.error("GitHub or GitHub Token isn't valid...")

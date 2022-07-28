@@ -56,8 +56,6 @@ if __name__ == "__main__":
     if arguments.repository:
         owner, repo = arguments.repository.split("/", 1)
         logger.info(f"GitHub repo present - Owner: {owner}, Repository: {repo}")
-        if arguments.github_token:
-            logger.debug(f"GitHub Token :: {arguments.github_token[:8]}...")
 
         github = GitHub(
             owner=owner,
@@ -66,6 +64,7 @@ if __name__ == "__main__":
         )
 
     if arguments.output:
+        logger.debug(f"Creating output dir :: {arguments.output}")
         os.makedirs(arguments.output, exist_ok=True)
 
     databases = []
@@ -107,10 +106,8 @@ if __name__ == "__main__":
     else:
         raise Exception("Database / Language not set")
 
-    logger.debug(f"Databases to process :: {len(databases)}")
-
-    for database in databases:
-        logger.info(database)
+    logger.info(f"Databases to process :: {len(databases)}")
+    
 
     for database in databases:
         logger.info(f"Database setup complete: {database}")
