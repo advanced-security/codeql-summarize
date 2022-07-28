@@ -34,7 +34,7 @@ class GitHub:
         if not self.token:
             logger.warning("GitHub Token is not set, API access will be unavailable")
         else:
-            logger.debug(f"GitHub Token is set :: {self.token[:8]}")
+            logger.debug(f"GitHub Token is set")
 
 
 @dataclass
