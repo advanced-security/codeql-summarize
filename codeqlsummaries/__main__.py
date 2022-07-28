@@ -37,7 +37,7 @@ parser_github.add_argument(
     default=os.environ.get("GITHUB_REPOSITORY"),
     help="GitHb Repository",
 )
-parser_github.add_argument("--github-token", default=os.environ.get("GITHUB_TOKEN"))
+parser_github.add_argument("-t", "--github-token", default=os.environ.get("GITHUB_TOKEN"))
 
 
 if __name__ == "__main__":
@@ -60,8 +60,8 @@ if __name__ == "__main__":
     if not EXPORTERS.get(arguments.format):
         raise Exception(f"Format mode provided isn't valid: {arguments.format}")
 
-    if arguments.repository:
-        owner, repo = arguments.repository.split("/", 1)
+    if arguments.github_repository:
+        owner, repo = arguments.github_repository.split("/", 1)
         logger.info(f"GitHub repo present - Owner: {owner}, Repository: {repo}")
 
         github = GitHub(owner=owner, repo=repo, token=arguments.github_token)
