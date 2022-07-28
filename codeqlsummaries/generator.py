@@ -142,6 +142,7 @@ class Generator:
                     "Failed to decode BQRS. Failed command was: " + shlex.join(cmd)
                 )
 
+        logger.debug(f"writing json output to: {generatedJson}")
         with open(generatedJson) as f:
             results = json.load(f)
 
@@ -153,5 +154,7 @@ class Generator:
         rows = []
         for tup in results["#select"]["tuples"]:
             rows.extend(tup)
+
+        logger.debug(f"Final Row Summary count: {len(rows)}")
 
         return rows

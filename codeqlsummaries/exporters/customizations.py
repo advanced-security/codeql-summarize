@@ -30,7 +30,7 @@ private class {name}{type}Custom extends {models} {{
 
 
 def saveQLL(
-    database: CodeQLDatabase, output_customizations: str, github: GitHub = None, **kargs
+    database: CodeQLDatabase, output_customizations: str, github: GitHub, **kargs
 ):
     padding = " " * 6
 
@@ -55,7 +55,7 @@ def saveQLL(
 
         # generate codeql lib for dabase
         custom = CODEQL_CUSTOMIZATION.format(
-            name=database.display_name, type=sname, models=sname, rows=rows
+            name=database.display_name(owner=github.owner), type=sname, models=sname, rows=rows
         )
 
         models[sname] = custom
@@ -72,13 +72,13 @@ def saveQLL(
 
 
 def exportCustomizations(
-    database: CodeQLDatabase, output: str, github: GitHub = None, **kargs
+    database: CodeQLDatabase, output: str, github: GitHub, **kargs
 ):
     logger.info(f"Running export customizations")
 
     path = os.path.join(output, "Customizations.qll")
 
-    saveQLL(database, path, github, **kargs)
+    saveQLL(database, path, github=github, **kargs)
 
     return
 
@@ -110,7 +110,7 @@ module {owner} {{
 """
 
 
-def exportBundle(database: CodeQLDatabase, output: str, github: GitHub = None, **kargs):
+def exportBundle(database: CodeQLDatabase, output: str, github: GitHub, **kargs):
     working = kargs.get("working", os.getcwd())
     logger.debug(f"Working dir :: {working}")
     if not github or not github.owner:
@@ -142,7 +142,7 @@ def exportBundle(database: CodeQLDatabase, output: str, github: GitHub = None, *
     sub = os.path.join(root, github.owner, database.language)
     os.makedirs(sub, exist_ok=True)
 
-    name = database.display_name + "Generated"
+    name = database.display_name(owner=github.owner) + "Generated"
 
     db_custom_lib_path = os.path.join(sub, name + ".qll")
     saveQLL(database, db_custom_lib_path, github)
