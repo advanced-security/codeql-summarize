@@ -2,9 +2,15 @@ name: 'codeql-summary-generator'
 description: 'CodeQL Summary Generator'
 
 inputs:
+  project:
+    description: "Project Repo (owner/name)"
+
   projects:
     description: "Project File with projects"
     default: ./projects.json
+
+  language:
+    description: "Project Language"
 
   format:
     description: "Exporting Format (default: bundle)"
@@ -36,6 +42,8 @@ runs:
         python3 -m codeqlsummaries \
           --input "${{ inputs.projects }}" \
           --format "${{ inputs.format }}" \
+          --project-repo "${{ inputs.project }}" \
+          --language "${{ inputs.language }}" \
           --github-token "${{ inputs.token }}" \
           --github-repository "${{ inputs.repository }}"
 

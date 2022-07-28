@@ -30,6 +30,7 @@ parser.add_argument("--disable-cache", action="store_true")
 
 parser_codeql = parser.add_argument_group("CodeQL")
 parser_codeql.add_argument("--codeql-base", default="./codeql", help="CodeQL Base Path")
+parser_codeql.add_argument("-p", "--project-repo", help="Project Repo")
 parser_codeql.add_argument("-db", "--database", help="CodeQL Database Location")
 parser_codeql.add_argument("-l", "--language", help="CodeQL Database Language")
 
@@ -84,9 +85,8 @@ if __name__ == "__main__":
         os.makedirs(arguments.output, exist_ok=True)
     else:
         raise Exception("Output is not set")
-
     # Check input file or manual
-    if arguments.input:
+    if arguments.input and os.path.exists(arguments.input):
         """Input file is a `projects.json` file"""
         logger.info(f"Loaded input / projects file :: {arguments.input}")
 
@@ -117,15 +117,27 @@ if __name__ == "__main__":
 
         logger.info("Finished loading databases from input file")
 
+    elif github and arguments.project_repo and arguments.language:
+        logger.info(f"Analysing remote repo: {arguments.project_repo} ({arguments.language})")
+        _, repo = arguments.project_repo.split("/", 1)
+        database = CodeQLDatabase(
+            repo,
+            language=arguments.language,
+            repository=arguments.project_repo
+        )
+        database.path = database.downloadDatabase(github, temppath)
+
+        databases.append(database)
+
     elif arguments.database and arguments.language:
         # find local db + language
-        database = CodeQLDatabase("test", arguments.database, arguments.language)
+        database = CodeQLDatabase("test", path=arguments.database, language=arguments.language)
         databases.append(database)
 
         logger.info("Finished loading database from path")
 
     else:
-        raise Exception("Database / Language not set")
+        raise Exception("Failed to set mode of analysis")
 
     logger.info(f"Databases to process :: {len(databases)}")
 
