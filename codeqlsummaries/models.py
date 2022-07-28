@@ -45,7 +45,6 @@ class CodeQLDatabase:
 
     path: Optional[str] = None
     repository: Optional[str] = None
-    token: Optional[str] = None
     summaries: Dict[str, Summaries] = field(default_factory=dict)
 
     session: Session = Session()
