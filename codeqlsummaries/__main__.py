@@ -16,15 +16,14 @@ parser = ArgumentParser("codeqlsummaries", "CodeQL Summary Generator")
 parser.add_argument(
     "--debug", action="store_true", default=bool(os.environ.get("DEBUG"))
 )
-parser.add_argument("-m", "--mode", type=str, help="Mode to run the tool in")
 parser.add_argument(
     "-f",
     "--format",
-    default="customizations",
-    help="Export format (`customizations`, `mad`, `bundle`)",
+    default="bundle",
+    help="Export format (`json`, `customizations`, `mad`, `bundle`)",
 )
-parser.add_argument("-i", "--input")
-parser.add_argument("-o", "--output", default=os.getcwd())
+parser.add_argument("-i", "--input", help="Input / Project File")
+parser.add_argument("-o", "--output", default=os.getcwd(), help="Output DIR")
 parser.add_argument("--working", default=os.getcwd())
 
 parser_codeql = parser.add_argument_group("CodeQL")
@@ -34,7 +33,7 @@ parser_codeql.add_argument("-l", "--language", help="CodeQL Database Language")
 parser_github = parser.add_argument_group("GitHub")
 parser_github.add_argument(
     "-r",
-    "--repository",
+    "--github-repository",
     default=os.environ.get("GITHUB_REPOSITORY"),
     help="GitHb Repository",
 )
