@@ -54,6 +54,7 @@ if __name__ == "__main__":
     temppath = os.path.join(
         os.environ.get("RUNNER_TEMP", tempfile.gettempdir()), "codeqlsummaries"
     )
+    os.makedirs(arguments.output, exist_ok=True)
 
     logging.basicConfig(
         level=logging.DEBUG if arguments.debug else logging.INFO,
