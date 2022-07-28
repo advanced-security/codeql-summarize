@@ -1,6 +1,7 @@
 import os
 import zipfile
 import logging
+import tempfile
 from typing import *
 from dataclasses import *
 
@@ -42,12 +43,14 @@ class CodeQLDatabase:
     token: Optional[str] = None
     summaries: Dict[str, Summaries] = field(default_factory=dict)
 
+    tmp: ClassVar[str] = tempfile.gettempdir()
+
     session: Session = Session()
 
     def __post_init__(self):
         if self.path and not os.path.exists(self.path):
             raise Exception("Database folder incorrect")
-        
+       
         if self.language not in CODEQL_LANGUAGES:
             raise Exception("Language is not supported by CodeQL Summary Generator")
 
