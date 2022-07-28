@@ -51,12 +51,6 @@ if __name__ == "__main__":
     github = None
     databases = []
 
-    # Support for Actions temp dirs
-    temppath = os.path.join(
-        os.environ.get("RUNNER_TEMP", tempfile.gettempdir()), "codeqlsummaries"
-    )
-    os.makedirs(temppath, exist_ok=True)
-
     logging.basicConfig(
         level=logging.DEBUG if arguments.debug else logging.INFO,
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -68,6 +62,13 @@ if __name__ == "__main__":
 
     if not EXPORTERS.get(arguments.format):
         raise Exception(f"Format mode provided isn't valid: {arguments.format}")
+
+    # Support for Actions temp dirs
+    temppath = os.path.join(
+        os.environ.get("RUNNER_TEMP", tempfile.gettempdir()), "codeqlsummaries"
+    )
+    os.makedirs(temppath, exist_ok=True)
+    Generator.TEMP_PATH = temppath
 
     if arguments.github_repository:
         owner, repo = arguments.github_repository.split("/", 1)
