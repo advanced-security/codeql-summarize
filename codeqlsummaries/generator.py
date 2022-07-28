@@ -34,10 +34,13 @@ class Generator:
         self.database = database
         # working temp dir
 
-    def getCodeQLRepo(self):
+    @staticmethod
+    def getCodeQLRepo():
         if os.path.exists(Generator.CODEQL_LOCATION):
-            # TODO: Update to latest?
+            logger.warning(f"CodeQL already exists, not getting latest...")
             return
+
+        logger.info(f"Downloading CodeQL repo to :: {Generator.CODEQL_LOCATION}")
         cmd = [
             "git",
             "clone",
@@ -47,7 +50,7 @@ class Generator:
             Generator.CODEQL_LOCATION,
         ]
         with open(os.devnull, "w") as null:
-            ret = subprocess.run(cmd, stdout=null)
+            ret = subprocess.run(cmd, stdout=null, stderr=null)
             if ret != 0:
                 raise Exception("Error getting CodeQL repo")
         return Generator

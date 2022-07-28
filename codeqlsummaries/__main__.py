@@ -29,6 +29,7 @@ parser.add_argument("--working", default=os.getcwd())
 parser.add_argument("--disable-cache", action="store_true")
 
 parser_codeql = parser.add_argument_group("CodeQL")
+parser_codeql.add_argument("--codeql-base", default="./codeql", help="CodeQL Base Path")
 parser_codeql.add_argument("-db", "--database", help="CodeQL Database Location")
 parser_codeql.add_argument("-l", "--language", help="CodeQL Database Language")
 
@@ -73,6 +74,9 @@ if __name__ == "__main__":
         logger.info(f"GitHub repo present - Owner: {owner}, Repository: {repo}")
 
         github = GitHub(owner=owner, repo=repo, token=arguments.github_token)
+
+    if not os.path.exists(Generator.CODEQL_LOCATION):
+        Generator.getCodeQLRepo()
 
     if arguments.output:
         logger.debug(f"Creating output dir :: {arguments.output}")
