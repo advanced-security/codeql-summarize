@@ -2,6 +2,7 @@ import os
 import zipfile
 import logging
 import tempfile
+import shutil
 from typing import *
 from dataclasses import *
 
@@ -75,7 +76,9 @@ class CodeQLDatabase:
         # TODO
         return "temp_db"
 
-    def downloadDatabase(self, github: GitHub, output: str) -> str:
+    def downloadDatabase(
+        self, github: GitHub, output: str, use_cache: bool = True
+    ) -> str:
         """Download CodeQL database"""
         url = f"{GitHub.endpoint}/repos/{self.repository}/code-scanning/codeql/databases/{self.language}"
         logger.debug(f"Endpoint to Download Database :: {url}")
@@ -93,8 +96,18 @@ class CodeQLDatabase:
         output_zip = os.path.join(output, self.database_folder + ".tar.gz")
         output_db = os.path.join(output, self.database_folder)
 
+        # Deleting cached files
+        if not use_cache:
+            logger.info(f"Deleting cached files...")
+            if os.path.exists(output_db):
+                shutil.rmtree(output_db)
+
+            if os.path.exists(output_zip):
+                os.remove(output_zip)
+
         if not os.path.exists(output_zip):
             logger.info("Downloading CodeQL Database from GitHub")
+
             with github.session.get(
                 url, headers=headers, stream=True, allow_redirects=True
             ) as r:

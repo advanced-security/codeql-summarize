@@ -26,6 +26,8 @@ parser.add_argument("-i", "--input", help="Input / Project File")
 parser.add_argument("-o", "--output", default=os.getcwd(), help="Output DIR")
 parser.add_argument("--working", default=os.getcwd())
 
+parser.add_argument("--disable-cache", action="store_true")
+
 parser_codeql = parser.add_argument_group("CodeQL")
 parser_codeql.add_argument("-db", "--database", help="CodeQL Database Location")
 parser_codeql.add_argument("-l", "--language", help="CodeQL Database Language")
@@ -37,7 +39,9 @@ parser_github.add_argument(
     default=os.environ.get("GITHUB_REPOSITORY"),
     help="GitHb Repository",
 )
-parser_github.add_argument("-t", "--github-token", default=os.environ.get("GITHUB_TOKEN"))
+parser_github.add_argument(
+    "-t", "--github-token", default=os.environ.get("GITHUB_TOKEN")
+)
 
 
 if __name__ == "__main__":
@@ -66,7 +70,6 @@ if __name__ == "__main__":
 
         github = GitHub(owner=owner, repo=repo, token=arguments.github_token)
 
-
     if arguments.output:
         logger.debug(f"Creating output dir :: {arguments.output}")
         os.makedirs(arguments.output, exist_ok=True)
@@ -86,16 +89,18 @@ if __name__ == "__main__":
         for lang, repos in projects.items():
             for repo in repos:
                 _, name = repo.split("/")
-                
+
                 db = CodeQLDatabase(name=name, language=lang, repository=repo)
 
                 if github and db.repository:
                     logger.info(f"Downloading database for :: {repo}")
 
-                    download_path = db.downloadDatabase(github, temppath)
+                    download_path = db.downloadDatabase(
+                        github, temppath, use_cache=not arguments.disable_cache
+                    )
 
                     db.path = download_path
-                
+
                 if not db.path:
                     logger.warning(f"CodeQL Database path is not set")
 
@@ -133,12 +138,8 @@ if __name__ == "__main__":
                 continue
             database.summaries[name] = generator.runQuery(query_path)
 
-            # temp
-            for summary, data in database.summaries.items():
-                logger.info(f" Summary('{summary}', rows='{len(data.rows)}')")
-
-                with open("./test.txt", "w") as handle:
-                    handle.writelines(data.rows)
+        for summary, data in database.summaries.items():
+            logger.info(f" Summary('{summary}', rows='{len(data.rows)}')")
 
         logger.info(f"Running exporter :: {arguments.format}")
 

@@ -34,7 +34,6 @@ class Generator:
         self.database = database
         # working temp dir
 
-
     def getCodeQLRepo(self):
         if os.path.exists(Generator.CODEQL_LOCATION):
             # TODO: Update to latest?
@@ -61,17 +60,17 @@ class Generator:
 
         if query_file:
             query_path = f"{Generator.CODEQL_LOCATION}/{self.database.language}/ql/src/utils/model-generator/{query_file}"
-            logger.debug(f"Query path :: {query_path}")
             if os.path.exists(query_path):
                 return query_path
 
         # Find in this repo
-
         return
 
     def runQuery(self, query: str) -> Summaries:
         logger.info("Running Query :: " + query)
         resultBqrs = os.path.join(Generator.TEMP_PATH, "out.bqrs")
+        output_std = os.path.join(Generator.TEMP_PATH, "runquery.txt")
+
         cmd = [
             "codeql",
             "query",
@@ -85,17 +84,22 @@ class Generator:
             "8",
         ]
 
-        ret = subprocess.call(cmd)
-        if ret != 0:
-            raise Exception("Failed to generate " + query)
+        with open(output_std, "w") as std:
+            ret = subprocess.call(cmd, stdout=std, stderr=std)
+            if ret != 0:
+                logger.error(f"See log file: {output_std}")
+                raise Exception("Failed to generate " + query)
 
         rows = self.readRows(resultBqrs)
 
         return Summaries(rows)
 
     def readRows(self, bqrsFile):
+        logger.debug(f"Processing rows")
         # //"package;type;overrides;name;signature;ext;spec;kind"
         generatedJson = os.path.join(Generator.TEMP_PATH, "out.json")
+        output_std = os.path.join(Generator.TEMP_PATH, "rows.txt")
+
         cmd = [
             "codeql",
             "bqrs",
@@ -105,11 +109,14 @@ class Generator:
             "--output",
             generatedJson,
         ]
-        ret = subprocess.call(cmd)
-        if ret != 0:
-            raise Exception(
-                "Failed to decode BQRS. Failed command was: " + shlex.join(cmd)
-            )
+
+        with open(output_std, "w") as std:
+            ret = subprocess.call(cmd, stdout=std, stderr=std)
+            if ret != 0:
+                logger.error(f"See log file: {output_std}")
+                raise Exception(
+                    "Failed to decode BQRS. Failed command was: " + shlex.join(cmd)
+                )
 
         with open(generatedJson) as f:
             results = json.load(f)
