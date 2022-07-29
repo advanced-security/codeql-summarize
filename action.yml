@@ -38,7 +38,7 @@ runs:
     # -i ./testing/codeql-bundle/projects.json -f bundle --working ./testing/codeql-bundle
     - shell: bash
       run: |
-        PYTHONPATH=${{ github.action_path }} && export PYTHONPATH=${{ github.action_path }}
+        PYTHONPATH="${{ github.action_path }}" \
         python3 -m codeqlsummaries \
           --input "${{ inputs.projects }}" \
           --format "${{ inputs.format }}" \
