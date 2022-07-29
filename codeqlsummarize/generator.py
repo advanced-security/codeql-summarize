@@ -14,7 +14,7 @@ from typing import *
 from codeqlsummarize import __MODULE_PATH__
 from codeqlsummarize.models import CodeQLDatabase, Summaries
 
-logger = logging.getLogger("codeqlsummaries.generator")
+logger = logging.getLogger("codeqlsummarize.generator")
 
 
 # https://github.com/github/codeql/tree/main/java/ql/src/utils/model-generator
@@ -29,7 +29,7 @@ class Generator:
     CODEQL_LOCATION = os.path.realpath(os.path.join(__MODULE_PATH__, "..", "codeql"))
     CODEQL_REPO = "https://github.com/github/codeql.git"
 
-    TEMP_PATH = os.path.join(tempfile.gettempdir(), "codeqlsummaries")
+    TEMP_PATH = os.path.join(tempfile.gettempdir(), "codeqlsummarize")
 
     codeql_cli: Optional[str] = None
 

@@ -5,7 +5,7 @@ import logging
 from codeqlsummarize.models import CodeQLDatabase
 
 
-logger = logging.getLogger("codeqlsummaries.exporters.json")
+logger = logging.getLogger("codeqlsummarize.exporters.json")
 
 
 def exportToJson(database: CodeQLDatabase, output: str, **kargs):

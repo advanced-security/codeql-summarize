@@ -11,7 +11,7 @@ from codeqlsummarize.utils import request
 
 CODEQL_LANGUAGES = ["java"]
 
-logger = logging.getLogger("codeqlsummaries.models")
+logger = logging.getLogger("codeqlsummarize.models")
 
 
 @dataclass
