@@ -24,7 +24,7 @@ parser.add_argument(
 )
 parser.add_argument("-i", "--input", help="Input / Project File")
 parser.add_argument("-o", "--output", default=os.getcwd(), help="Output DIR")
-parser.add_argument("--working", default=os.getcwd())
+parser.add_argument("--working", default=os.getcwd(), help="Working directory of the generator")
 
 parser.add_argument("--disable-cache", action="store_true")
 
