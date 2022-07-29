@@ -30,12 +30,10 @@ runs:
     # -i ./testing/codeql-bundle/projects.json -f bundle --working ./testing/codeql-bundle
     - shell: bash
       run: |
-        PYTHONPATH="${{ github.action_path }}" \
-        python3 -m codeqlsummaries \
+        "${{ github.action_path }}/gh-codeql-summary-generator" \
           --input "${{ inputs.projects }}" \
           --format "${{ inputs.format }}" \
           --project-repo "${{ inputs.project }}" \
           --language "${{ inputs.language }}" \
           --github-token "${{ inputs.token }}" \
           --github-repository "${{ inputs.repository }}"
-
