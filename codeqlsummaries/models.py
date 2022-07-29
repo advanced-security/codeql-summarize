@@ -5,8 +5,7 @@ import tempfile
 import shutil
 from typing import *
 from dataclasses import *
-
-from requests import Session
+from codeqlsummaries.utils import request
 
 
 CODEQL_LANGUAGES = ["java"]
@@ -27,10 +26,7 @@ class GitHub:
     endpoint: ClassVar[str] = "https://api.github.com"
     token: Optional[str] = None
 
-    session: Session = field(default=Session())
-
     def __post_init__(self):
-        self.session = Session()
         if not self.token:
             logger.warning("GitHub Token is not set, API access will be unavailable")
         else:
@@ -46,8 +42,6 @@ class CodeQLDatabase:
     path: Optional[str] = None
     repository: Optional[str] = None
     summaries: Dict[str, Summaries] = field(default_factory=dict)
-
-    session: Session = Session()
 
     def __post_init__(self):
         if self.path and not os.path.exists(self.path):
@@ -116,16 +110,18 @@ class CodeQLDatabase:
         if not os.path.exists(output_zip):
             logger.info("Downloading CodeQL Database from GitHub")
 
-            with github.session.get(
-                url, headers=headers, stream=True, allow_redirects=True
+            with request(
+                url,
+                headers=headers,
+                method="get",
             ) as r:
-                r.raise_for_status()
                 with open(output_zip, "wb") as f:
-                    for chunk in r.iter_content(chunk_size=8192):
-                        # If you have chunk encoded response uncomment if
-                        # and set chunk_size parameter to None.
-                        # if chunk:
+                    while True:
+                        chunk = r.read(8192)
+                        if not chunk:
+                            break
                         f.write(chunk)
+
         else:
             logger.info("Database archive is present on system, skipping download...")
 

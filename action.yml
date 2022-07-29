@@ -27,23 +27,13 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - shell: bash
-      run: |
-        echo "::group::Installing Dependencies"
-        pushd ${{ github.action_path }}
-        python3 -m pip install pipenv && python3 -m pipenv install --system
-        popd
-        echo "::endgroup::"
-
     # -i ./testing/codeql-bundle/projects.json -f bundle --working ./testing/codeql-bundle
     - shell: bash
       run: |
-        PYTHONPATH=${{ github.action_path }} && export PYTHONPATH=${{ github.action_path }}
-        python3 -m codeqlsummaries \
+        "${{ github.action_path }}/gh-codeql-summary-generator" \
           --input "${{ inputs.projects }}" \
           --format "${{ inputs.format }}" \
           --project-repo "${{ inputs.project }}" \
           --language "${{ inputs.language }}" \
           --github-token "${{ inputs.token }}" \
           --github-repository "${{ inputs.repository }}"
-
