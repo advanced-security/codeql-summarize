@@ -11,8 +11,8 @@ import tempfile
 import logging
 from typing import *
 
-from codeqlsummaries import __MODULE_PATH__
-from codeqlsummaries.models import CodeQLDatabase, Summaries
+from codeqlsummarize import __MODULE_PATH__
+from codeqlsummarize.models import CodeQLDatabase, Summaries
 
 logger = logging.getLogger("codeqlsummaries.generator")
 

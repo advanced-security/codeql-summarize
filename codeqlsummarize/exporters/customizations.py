@@ -3,8 +3,8 @@ import json
 import logging
 from dataclasses import asdict
 
-from codeqlsummaries.models import CodeQLDatabase, GitHub
-from codeqlsummaries.generator import QUERIES
+from codeqlsummarize.models import CodeQLDatabase, GitHub
+from codeqlsummarize.generator import QUERIES
 
 logger = logging.getLogger("codeqlsummaries.exporters")
 

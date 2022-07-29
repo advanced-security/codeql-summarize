@@ -4,10 +4,10 @@ import logging
 import tempfile
 from argparse import ArgumentParser
 
-from codeqlsummaries import __MODULE_PATH__
-from codeqlsummaries.generator import Generator, QUERIES
-from codeqlsummaries.models import CodeQLDatabase, GitHub
-from codeqlsummaries.exporters import EXPORTERS
+from codeqlsummarize import __MODULE_PATH__
+from codeqlsummarize.generator import Generator, QUERIES
+from codeqlsummarize.models import CodeQLDatabase, GitHub
+from codeqlsummarize.exporters import EXPORTERS
 
 logger = logging.getLogger("main")
 
