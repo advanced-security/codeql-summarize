@@ -6,7 +6,7 @@ from dataclasses import asdict
 from codeqlsummarize.models import CodeQLDatabase, GitHub
 from codeqlsummarize.generator import QUERIES
 
-logger = logging.getLogger("codeqlsummaries.exporters")
+logger = logging.getLogger("codeqlsummarize.exporters")
 
 
 CODEQL_LIBRARY = """\

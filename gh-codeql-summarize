@@ -2,4 +2,4 @@
 set -eu
 HERE="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 export PYTHONPATH="${HERE}"
-exec python3 -m codeqlsummaries "$@"
+exec python3 -m codeqlsummarize "$@"

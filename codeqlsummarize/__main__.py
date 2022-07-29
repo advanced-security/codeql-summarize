@@ -12,7 +12,7 @@ from codeqlsummarize.exporters import EXPORTERS
 logger = logging.getLogger("main")
 
 
-parser = ArgumentParser("codeqlsummaries", "CodeQL Summary Generator")
+parser = ArgumentParser("codeql-summarize", "CodeQL Summary Generator")
 parser.add_argument(
     "--debug", action="store_true", default=bool(os.environ.get("DEBUG"))
 )
@@ -66,7 +66,7 @@ if __name__ == "__main__":
 
     # Support for Actions temp dirs
     temppath = os.path.join(
-        os.environ.get("RUNNER_TEMP", tempfile.gettempdir()), "codeqlsummaries"
+        os.environ.get("RUNNER_TEMP", tempfile.gettempdir()), "codeqlsummarize"
     )
     os.makedirs(temppath, exist_ok=True)
     Generator.TEMP_PATH = temppath
