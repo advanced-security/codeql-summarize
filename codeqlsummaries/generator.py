@@ -105,7 +105,7 @@ class Generator:
             "--output",
             resultBqrs,
             "--threads",
-            "8",
+            "0",
         ]
 
         with open(output_std, "w") as std:
