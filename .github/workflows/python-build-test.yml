@@ -27,7 +27,7 @@ jobs:
 
     - name: Run Tests
       run: |
-        pipenv run tests
+        python -m unittest discover -v -s ./tests -p test_*.py
 
     # Pull Request auto-linting
     - name: Lint
