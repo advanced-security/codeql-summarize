@@ -1,8 +1,11 @@
 import os
+import sys
 import json
 import logging
 import tempfile
 from argparse import ArgumentParser
+
+sys.path.append(".")
 
 from codeqlsummarize import __MODULE_PATH__
 from codeqlsummarize.generator import Generator, QUERIES
