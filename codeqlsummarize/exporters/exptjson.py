@@ -2,7 +2,7 @@ import os
 import json as js
 import logging
 
-from codeqlsummaries.models import CodeQLDatabase
+from codeqlsummarize.models import CodeQLDatabase
 
 
 logger = logging.getLogger("codeqlsummaries.exporters.json")

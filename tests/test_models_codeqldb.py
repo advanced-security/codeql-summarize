@@ -2,7 +2,7 @@ import sys
 import unittest
 sys.path.append(".")
 
-from codeqlsummaries.models import CodeQLDatabase
+from codeqlsummarize.models import CodeQLDatabase
 
 
 class TestModelCodeQLDB(unittest.TestCase):

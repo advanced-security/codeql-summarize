@@ -5,7 +5,8 @@ import tempfile
 import shutil
 from typing import *
 from dataclasses import *
-from codeqlsummaries.utils import request
+
+from codeqlsummarize.utils import request
 
 
 CODEQL_LANGUAGES = ["java"]
