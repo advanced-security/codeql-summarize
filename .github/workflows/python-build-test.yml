@@ -33,12 +33,12 @@ jobs:
 
     # Pull Request auto-linting
     - name: Lint
-      if: github.event_name != 'pull_request'
+      if: github.event_name == 'pull_request'
       run: |
         black .
         
     - name: Linting Commit Update
-      if: github.event_name != 'pull_request'
+      if: github.event_name == 'pull_request'
       run: |
         git config --global user.name 'Git bot'
         git config --global user.email 'bot@noreply.github.com'
