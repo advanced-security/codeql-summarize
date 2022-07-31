@@ -103,7 +103,7 @@ if __name__ == "__main__":
         databases.append(database)
 
     # If a project file is present
-    elif arguments.input and os.path.exists(arguments.input):
+    elif arguments.input:
         """Input file is a `projects.json` file"""
         logger.info(f"Loaded input / projects file :: {arguments.input}")
 
