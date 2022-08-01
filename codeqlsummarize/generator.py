@@ -32,9 +32,6 @@ QUERIES = {
 
 
 class Generator:
-    CODEQL_LOCATION = realpath(join(__MODULE_PATH__, "..", "codeql"))
-    CODEQL_REPO = "https://github.com/github/codeql.git"
-
     TEMP_PATH = join(tempfile.gettempdir(), "codeqlsummarize")
 
     codeql: Optional[str] = None
@@ -45,47 +42,39 @@ class Generator:
         if not self.codeql:
             raise Exception('Failed to find CodeQL distribution!')
 
-    @staticmethod
-    def getCodeQLRepo():
-        if exists(Generator.CODEQL_LOCATION):
-            logger.warning(f"CodeQL already exists, not getting latest...")
-            return
-
-        logger.info(f"Downloading CodeQL repo to :: {Generator.CODEQL_LOCATION}")
-        git = exec_from_path_env('git')
-        git(
-            "clone",
-            "--depth", "1",
-            Generator.CODEQL_REPO,
-            Generator.CODEQL_LOCATION,
+        self.pack_name = f'codeql/{database.language}-queries'
+        self.codeql(
+            'pack', 'download',
+            self.pack_name
         )
-        return Generator
 
     def getModelGeneratorQuery(self, name) -> Optional[str]:
         logger.info(f"Finding query name: {name}")
-        query_path = None
         # Find in CodeQL
         query_file = QUERIES.get(name)
 
         if query_file:
-            query_path = f"{Generator.CODEQL_LOCATION}/{self.database.language}/ql/src/utils/model-generator/{query_file}"
-            if exists(query_path):
-                return query_path
+            return f"{self.pack_name}:utils/model-generator/{query_file}"
 
         # Find in this repo
-        return
+        return None
 
     def runQuery(self, query: str) -> Summaries:
         logger.info("Running Query :: " + query)
-        resultBqrs = join(Generator.TEMP_PATH, "out.bqrs")
+        resultBqrs = join(
+            self.database.path,
+            'results',
+            query.replace(':', '/').replace('.ql', '.bqrs')
+        )
+
         output_std = join(Generator.TEMP_PATH, "runquery.txt")
 
+        print(f'Running query "{query}"...')
         with open(output_std, "wb") as std:
             self.codeql(
-                "query", "run",
-                "--database", self.database.path,
-                "--output", resultBqrs,
+                "database", "run-queries",
                 "--threads", "0",
+                self.database.path,
                 query,
                 outconsumer=print_to_stream(std),
             )
