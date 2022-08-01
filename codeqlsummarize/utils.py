@@ -19,7 +19,7 @@ import os
 import io
 
 
-logger = logging.getLogger("codeqlsummarize.generator")
+logger = logging.getLogger("codeqlsummarize.utils")
 
 
 def request(
@@ -117,11 +117,15 @@ class Executable:
 
 
 def exec_from_path_env(execname):
+    """ Find CodeQL in PATH
+    """
     e = shutil.which(execname)
     return Executable(e) if e else None
 
 
 def codeql_from_gh_codeql():
+    """ Find CodeQL using GitHub CLI CodeQL Extension
+    """
     gh = exec_from_path_env('gh')
     if gh:
         try:
@@ -146,10 +150,14 @@ def codeql_from_gh_codeql():
 
 
 def codeql_exec_name():
+    """ Check CodeQL CLI name based on OS Type
+    """
     return "codeql" + ("" if os.name == "posix" else ".exe")
 
 
 def codeql_from_actions():
+    """ Find CodeQL in GitHub Actions
+    """
     actions = glob.glob(
         os.path.join(
             os.environ.get("RUNNER_TOOL_CACHE", ""),
@@ -167,6 +175,8 @@ def codeql_from_actions():
 
 
 def findCodeQLCli():
+    """ Find CodeQL executable
+    """
     return \
         exec_from_path_env('codeql') or \
         codeql_from_gh_codeql() or \
