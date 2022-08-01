@@ -98,7 +98,6 @@ def main(arguments):
     if arguments.output:
         output = os.path.splitext(arguments.output)
         if output[1] != "":
-            # file
             logger.debug(f"Output is a file")
         else:
             logger.debug(f"Creating output dir :: {arguments.output}")
@@ -119,14 +118,13 @@ def main(arguments):
                 repo, language=language, repository=arguments.project_repo
             )
 
-            # TODO: Set path
             if github.avalible:
                 database.path = database.downloadDatabase(github, temppath)
             elif arguments.database:
                 logger.debug("Setting database to arguments.database ")
                 database.path = arguments.database
             else:
-                logger.warning(f"Download and path were not set...")
+                logger.warning(f"Failed to download or find database path...")
 
             databases.append(database)
 
