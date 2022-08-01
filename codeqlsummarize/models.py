@@ -57,7 +57,7 @@ class CodeQLDatabase:
     def exists(self) -> bool:
         return False if not self.path else os.path.exists(self.path)
 
-    def display_name(self, owner: str = None):
+    def display_name(self, owner: Optional[str] = None) -> str:
         if self.repository:
             r = self.repository.replace("-", " ")
             own, repo = r.split("/", 1)

@@ -19,7 +19,7 @@ def request(
     url: str,
     method: str = "GET",
     headers: dict = {},
-    data: bytes = None,
+    data: Optional[bytes] = None,
 ):
     method = method.upper()
 
