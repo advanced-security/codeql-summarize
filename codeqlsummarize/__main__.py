@@ -11,6 +11,7 @@ from codeqlsummarize import __MODULE_PATH__
 from codeqlsummarize.generator import Generator, QUERIES
 from codeqlsummarize.models import CodeQLDatabase, GitHub
 from codeqlsummarize.exporters import EXPORTERS
+from codeqlsummarize.utils import detectLanguage
 
 logger = logging.getLogger("main")
 
@@ -26,8 +27,7 @@ parser.add_argument(
     help="Export format (`json`, `customizations`, `mad`, `bundle`)",
 )
 parser.add_argument("-i", "--input", help="Input / Project File")
-parser.add_argument("-o", "--output", default=os.getcwd(), help="Output DIR")
-parser.add_argument("--working", default=os.getcwd(), help="Working directory of the generator")
+parser.add_argument("-o", "--output", default=os.getcwd(), help="Output directory / file")
 
 parser.add_argument("--disable-cache", action="store_true")
 
@@ -48,12 +48,12 @@ parser_github.add_argument(
     "-t", "--github-token", default=os.environ.get("GITHUB_TOKEN")
 )
 
-
-if __name__ == "__main__":
-    arguments = parser.parse_args()
-
-    github = None
-    databases = []
+def main(arguments):
+    """ Main workflow
+    """
+    github = GitHub(token=arguments.github_token)
+    languages: list[str] = []
+    databases: list[CodeQLDatabase] = []
 
     logging.basicConfig(
         level=logging.DEBUG if arguments.debug else logging.INFO,
@@ -74,37 +74,66 @@ if __name__ == "__main__":
     os.makedirs(temppath, exist_ok=True)
     Generator.TEMP_PATH = temppath
 
+    if arguments.language:
+        languages.extend(arguments.language.split(","))
+
+    elif (arguments.database or arguments.project_repo) and not arguments.language:
+        logger.info(f"Language not detected, running auto-detect...")
+        langs = detectLanguage(
+            database=arguments.database, project_repo=arguments.project_repo
+        )
+
+        if langs:
+            languages.extend(langs)
+
     if arguments.github_repository:
         owner, repo = arguments.github_repository.split("/", 1)
         logger.info(f"GitHub repo present - Owner: {owner}, Repository: {repo}")
-
-        github = GitHub(owner=owner, repo=repo, token=arguments.github_token)
+        github.owner = owner
+        github.repo = repo
 
     if not os.path.exists(Generator.CODEQL_LOCATION):
         Generator.getCodeQLRepo()
 
     if arguments.output:
-        logger.debug(f"Creating output dir :: {arguments.output}")
-        os.makedirs(arguments.output, exist_ok=True)
+        output = os.path.splitext(arguments.output)
+        if output[1] != "":
+            # file
+            logger.debug(f"Output is a file")
+        else:
+            logger.debug(f"Creating output dir :: {arguments.output}")
+            os.makedirs(arguments.output, exist_ok=True)
     else:
         raise Exception("Output is not set")
-    
-    # If scan repo settings are present
-    if github and arguments.project_repo and arguments.language:
-        logger.info(f"Analysing remote repo: {arguments.project_repo} ({arguments.language})")
-        _, repo = arguments.project_repo.split("/", 1)
-        database = CodeQLDatabase(
-            repo,
-            language=arguments.language,
-            repository=arguments.project_repo
-        )
-        database.path = database.downloadDatabase(github, temppath)
 
-        databases.append(database)
+    # If scan repo settings are present
+    if arguments.project_repo:
+        _, repo = arguments.project_repo.split("/", 1)
+
+        for language in languages:
+            logger.info(
+                f"Analysing remote repo: {arguments.project_repo} ({language})"
+            )
+
+            database = CodeQLDatabase(
+                repo, language=language, repository=arguments.project_repo
+            )
+
+            # TODO: Set path
+            if github.avalible:
+                database.path = database.downloadDatabase(github, temppath)
+            elif arguments.database:
+                logger.debug("Setting database to arguments.database ")
+                database.path = arguments.database
+            else:
+                logger.warning(f"Download and path were not set...")
+
+            databases.append(database)
 
     # If a project file is present
-    elif arguments.input and os.path.exists(arguments.input):
+    elif arguments.input:
         """Input file is a `projects.json` file"""
+        # TODO: Schema check?
         logger.info(f"Loaded input / projects file :: {arguments.input}")
 
         if not os.path.exists(arguments.input):
@@ -118,7 +147,7 @@ if __name__ == "__main__":
 
                 db = CodeQLDatabase(name=name, language=lang, repository=repo)
 
-                if github and db.repository:
+                if github.avalible and db.repository:
                     logger.info(f"Downloading database for :: {repo}")
 
                     download_path = db.downloadDatabase(
@@ -134,10 +163,13 @@ if __name__ == "__main__":
 
         logger.info("Finished loading databases from input file")
 
-    elif arguments.database and arguments.language:
-        # find local db + language
-        database = CodeQLDatabase("test", path=arguments.database, language=arguments.language)
-        databases.append(database)
+    elif arguments.database:
+        for language in languages:
+            # find local db + language
+            database = CodeQLDatabase(
+                "test", path=arguments.database, language=language
+            )
+            databases.append(database)
 
         logger.info("Finished loading database from path")
 
@@ -173,4 +205,9 @@ if __name__ == "__main__":
         if not exporter:
             raise Exception("Unknown or Unsupported exporter")
 
-        exporter(database, arguments.output, github=github, working=arguments.working)
+        exporter(database, arguments.output, github=github)
+
+
+if __name__ == "__main__":
+    arguments = parser.parse_args()
+    main(arguments)

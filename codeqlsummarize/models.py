@@ -9,7 +9,7 @@ from dataclasses import *
 from codeqlsummarize.utils import request
 
 
-CODEQL_LANGUAGES = ["java"]
+CODEQL_LANGUAGES = ["java", "csharp"]
 
 logger = logging.getLogger("codeqlsummarize.models")
 
@@ -21,8 +21,8 @@ class Summaries:
 
 @dataclass
 class GitHub:
-    owner: str
-    repo: str
+    owner: Optional[str] = None
+    repo: Optional[str] = None
 
     endpoint: ClassVar[str] = "https://api.github.com"
     token: Optional[str] = None
@@ -33,6 +33,9 @@ class GitHub:
         else:
             logger.debug(f"GitHub Token is set")
 
+    @property
+    def avalible(self):
+        return self.token is not None
 
 @dataclass
 class CodeQLDatabase:
