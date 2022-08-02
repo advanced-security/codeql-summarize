@@ -21,8 +21,8 @@ class Summaries:
 
 @dataclass
 class GitHub:
-    owner: str
-    repo: str
+    owner: Optional[str] = None
+    repo: Optional[str] = None
 
     endpoint: ClassVar[str] = "https://api.github.com"
     token: Optional[str] = None
@@ -33,6 +33,9 @@ class GitHub:
         else:
             logger.debug(f"GitHub Token is set")
 
+    @property
+    def avalible(self):
+        return self.token is not None
 
 @dataclass
 class CodeQLDatabase:
@@ -54,7 +57,7 @@ class CodeQLDatabase:
     def exists(self) -> bool:
         return False if not self.path else os.path.exists(self.path)
 
-    def display_name(self, owner: str = None):
+    def display_name(self, owner: Optional[str] = None) -> str:
         if self.repository:
             r = self.repository.replace("-", " ")
             own, repo = r.split("/", 1)

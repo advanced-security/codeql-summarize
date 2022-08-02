@@ -56,7 +56,10 @@ def saveQLL(
 
         # generate codeql lib for dabase
         custom = CODEQL_CUSTOMIZATION.format(
-            name=database.display_name(owner=owner), type=sname, models=sname, rows=rows
+            name=database.display_name(owner=owner),
+            type=sname,
+            models=sname,
+            rows=rows,
         )
 
         models[sname] = custom
@@ -76,10 +79,10 @@ def exportCustomizations(
     database: CodeQLDatabase, output: str, github: GitHub, **kargs
 ):
     logger.info(f"Running export customizations")
+    if not output.endswith(".qll"):
+        raise Exception(f"CodeQL customizations file does not endwith `.qll`")
 
-    path = os.path.join(output, "Customizations.qll")
-
-    saveQLL(database, path, github=github, **kargs)
+    saveQLL(database, output, github=github, **kargs)
 
     return
 
@@ -112,12 +115,11 @@ module {owner} {{
 
 
 def exportBundle(database: CodeQLDatabase, output: str, github: GitHub, **kargs):
-    working = kargs.get("working", os.getcwd())
-    logger.debug(f"Working dir :: {working}")
-
+    logger.debug(f"Working dir :: {output}")
+      
     owner = github.owner.replace("-", "_")
-
-    if not github or not owner:
+    
+    if not github or not github.owner:
         raise Exception("Failed to export Bundle: No owner / repo name set")
 
     # Create root for language
