@@ -7,7 +7,7 @@ from argparse import ArgumentParser
 
 sys.path.append(".")
 
-from codeqlsummarize import __MODULE_PATH__
+from codeqlsummarize import __MODULE_PATH__, DOCUMENTATION
 from codeqlsummarize.generator import Generator, QUERIES
 from codeqlsummarize.models import CodeQLDatabase, GitHub
 from codeqlsummarize.exporters import EXPORTERS
@@ -116,7 +116,10 @@ def main(arguments):
             )
 
             if github.avalible:
-                database.path = database.downloadDatabase(github, temppath)
+                try:
+                    database.path = database.downloadDatabase(github, temppath)
+                except Exception as err:
+                    logger.warning(f"Error encounters downloading CodeQL Database: {err}")
             elif arguments.database:
                 logger.debug("Setting database to arguments.database ")
                 database.path = arguments.database
@@ -145,11 +148,12 @@ def main(arguments):
                 if github.avalible and db.repository:
                     logger.info(f"Downloading database for :: {repo}")
 
-                    download_path = db.downloadDatabase(
-                        github, temppath, use_cache=not arguments.disable_cache
-                    )
-
-                    db.path = download_path
+                    try:
+                        db.path = db.downloadDatabase(
+                            github, temppath, use_cache=not arguments.disable_cache
+                        )
+                    except Exception as err:
+                        logger.warning(f"Error encounters downloading CodeQL Database: {err}")
 
                 if not db.path:
                     logger.warning(f"CodeQL Database path is not set")
@@ -177,7 +181,11 @@ def main(arguments):
         logger.info(f"Database setup complete: {database}")
 
         if not database.exists():
-            raise Exception("CodeQL Database does not exist...")
+            logger.warning(f"Failed to find or download the CodeQL Database for '{database.name}'")
+            logger.warning("Please to the GitHub docs to find out how to build a CodeQL Database")
+            logger.warning(DOCUMENTATION.get("codeql_setup"))
+            logger.warning("Skipping project until Database is avalible...")
+            continue
 
         # find codeql
         generator = Generator(database)
