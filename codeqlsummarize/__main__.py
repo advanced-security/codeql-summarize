@@ -80,9 +80,6 @@ if __name__ == "__main__":
 
         github = GitHub(owner=owner, repo=repo, token=arguments.github_token)
 
-    if not os.path.exists(Generator.CODEQL_LOCATION):
-        Generator.getCodeQLRepo()
-
     if arguments.output:
         logger.debug(f"Creating output dir :: {arguments.output}")
         os.makedirs(arguments.output, exist_ok=True)
@@ -103,7 +100,7 @@ if __name__ == "__main__":
         databases.append(database)
 
     # If a project file is present
-    elif arguments.input and os.path.exists(arguments.input):
+    elif arguments.input:
         """Input file is a `projects.json` file"""
         logger.info(f"Loaded input / projects file :: {arguments.input}")
 
