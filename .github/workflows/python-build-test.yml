@@ -33,7 +33,7 @@ jobs:
       env:
         CODEQL_TOKEN: ${{ secrets.CODEQL_TOKEN }}
       run: |
-        ./gh-codeql-summarize --debug -i ./examples/projects.json -f bundle --working ./examples
+        ./gh-codeql-summarize --github-token $CODEQL_TOKEN -i ./examples/projects.json -f bundle --working ./examples
 
 
     # Pull Request auto-linting
