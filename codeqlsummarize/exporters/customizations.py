@@ -115,7 +115,7 @@ module {owner} {{
 
 
 def exportBundle(database: CodeQLDatabase, output: str, github: GitHub, **kargs):
-    logger.debug(f"Working dir :: {output}")
+    logger.debug(f"Output directory :: {output}")
       
     owner = github.owner.replace("-", "_")
     
@@ -123,7 +123,7 @@ def exportBundle(database: CodeQLDatabase, output: str, github: GitHub, **kargs)
         raise Exception("Failed to export Bundle: No owner / repo name set")
 
     # Create root for language
-    root = os.path.join(working, database.language, owner)
+    root = os.path.join(output, database.language, owner)
     os.makedirs(root, exist_ok=True)
     logger.debug(f"Root for language :: {root}")
 
