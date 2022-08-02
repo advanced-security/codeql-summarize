@@ -178,6 +178,6 @@ def findCodeQLCli():
     """ Find CodeQL executable
     """
     return \
-        exec_from_path_env('codeql') or \
+        exec_from_path_env(codeql_exec_name()) or \
         codeql_from_gh_codeql() or \
         codeql_from_actions()
