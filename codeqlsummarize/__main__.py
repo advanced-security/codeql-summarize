@@ -8,6 +8,7 @@ from argparse import ArgumentParser
 sys.path.append(".")
 
 from codeqlsummarize import __MODULE_PATH__, DOCUMENTATION
+from codeqlsummarize.__version__ import __banner__
 from codeqlsummarize.generator import Generator, QUERIES
 from codeqlsummarize.models import CodeQLDatabase, GitHub
 from codeqlsummarize.exporters import EXPORTERS
@@ -61,6 +62,8 @@ def main(arguments):
         level=logging.DEBUG if arguments.debug else logging.INFO,
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     )
+
+    print(__banner__)
     logger.debug("Debugging is enabled")
 
     if not arguments.format:
