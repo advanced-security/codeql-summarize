@@ -27,10 +27,13 @@ inputs:
 runs:
   using: "composite"
   steps:
-    # -i ./testing/codeql-bundle/projects.json -f bundle --working ./testing/codeql-bundle
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
     - shell: bash
       run: |
-        "${{ github.action_path }}/gh-codeql-summary-generator" \
+        "${{ github.action_path }}/gh-codeql-summarize" \
           --input "${{ inputs.projects }}" \
           --format "${{ inputs.format }}" \
           --project-repo "${{ inputs.project }}" \
