@@ -33,6 +33,7 @@ def saveQLL(
     database: CodeQLDatabase, output_customizations: str, github: GitHub, **kargs
 ):
     padding = " " * 6
+    owner = github.owner.replace("-", "_")
 
     models = {}
     # initially populate data
@@ -55,7 +56,7 @@ def saveQLL(
 
         # generate codeql lib for dabase
         custom = CODEQL_CUSTOMIZATION.format(
-            name=database.display_name(owner=github.owner),
+            name=database.display_name(owner=owner),
             type=sname,
             models=sname,
             rows=rows,
@@ -114,12 +115,15 @@ module {owner} {{
 
 
 def exportBundle(database: CodeQLDatabase, output: str, github: GitHub, **kargs):
-    logger.debug(f"Working dir :: {output}")
+    logger.debug(f"Output directory :: {output}")
+      
+    owner = github.owner.replace("-", "_")
+    
     if not github or not github.owner:
         raise Exception("Failed to export Bundle: No owner / repo name set")
 
     # Create root for language
-    root = os.path.join(output, database.language, github.owner)
+    root = os.path.join(output, database.language, owner)
     os.makedirs(root, exist_ok=True)
     logger.debug(f"Root for language :: {root}")
 
@@ -136,15 +140,15 @@ def exportBundle(database: CodeQLDatabase, output: str, github: GitHub, **kargs)
         with open(codeql_lang_pack, "w") as handle:
             handle.write(
                 CODEQL_PACK.format(
-                    owner=github.owner, version="0.1.0", language=database.language
+                    owner=owner, version="0.1.0", language=database.language
                 )
             )
 
     # Create language subfolder (if needed)
-    sub = os.path.join(root, github.owner, database.language)
+    sub = os.path.join(root, owner, database.language)
     os.makedirs(sub, exist_ok=True)
 
-    name = database.display_name(owner=github.owner) + "Generated"
+    name = database.display_name(owner=owner) + "Generated"
 
     db_custom_lib_path = os.path.join(sub, name + ".qll")
     saveQLL(database, db_custom_lib_path, github)
@@ -156,7 +160,7 @@ def exportBundle(database: CodeQLDatabase, output: str, github: GitHub, **kargs)
         if custom == "Customizations.qll":
             continue
 
-        impt = f"    private import {github.owner}.{database.language}.{name}\n"
+        impt = f"    private import {owner}.{database.language}.{name}\n"
         customizations_data += impt
 
     with open(customizations_path, "w") as handle:
@@ -164,7 +168,7 @@ def exportBundle(database: CodeQLDatabase, output: str, github: GitHub, **kargs)
             CODEQL_CUSTOMIZATIONS_QLL.format(
                 language=database.language,
                 custom=customizations_data,
-                owner=github.owner,
+                owner=owner,
             )
         )
 
