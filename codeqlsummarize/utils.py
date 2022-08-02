@@ -1,11 +1,14 @@
+import os
+import logging
+from typing import *
 from urllib.request import (
-  Request,
-  HTTPRedirectHandler,
-  HTTPDefaultErrorHandler,
-  OpenerDirector,
-  HTTPSHandler,
-  HTTPErrorProcessor,
-  UnknownHandler,
+    Request,
+    HTTPRedirectHandler,
+    HTTPDefaultErrorHandler,
+    OpenerDirector,
+    HTTPSHandler,
+    HTTPErrorProcessor,
+    UnknownHandler,
 )
 import subprocess
 from subprocess import CalledProcessError
@@ -22,11 +25,14 @@ import io
 logger = logging.getLogger("codeqlsummarize.utils")
 
 
+logger = logging.getLogger("codeqlsummarize.utils")
+
+
 def request(
     url: str,
     method: str = "GET",
     headers: dict = {},
-    data: bytes = None,
+    data: Optional[bytes] = None,
 ):
     method = method.upper()
 
@@ -48,6 +54,36 @@ def request(
     return opener.open(req)
 
 
+def loadYaml(path: str) -> Any:
+    """ Loading YAML files
+    """
+    try:
+        # TODO: Replace with a native solution
+        import yaml
+    except Exception as err:
+        logger.warning(f"Failed to load YAML parser: {err}")
+        return
+
+    with open(path, "r") as handle:
+        return yaml.safe_load(handle)
+
+
+def detectLanguage(database: str = "", project_repo: str = "", github = None) -> Optional[list[str]]:
+    """ Detect languages based on:
+    - the database
+    - the repo languages
+    """
+    schema_path = os.path.join(database, "codeql-database.yml")
+
+    if os.path.exists(schema_path):
+        schema = loadYaml(schema_path)
+        if schema and schema.get("primaryLanguage"):
+            return [schema.get("primaryLanguage")]
+    if project_repo:
+        # TODO: get from GitHub API languages
+        pass
+    return
+    
 def print_to_stream(f):
     def impl(cmd, stream):
         while True:
@@ -181,3 +217,4 @@ def findCodeQLCli():
         exec_from_path_env(codeql_exec_name()) or \
         codeql_from_gh_codeql() or \
         codeql_from_actions()
+
