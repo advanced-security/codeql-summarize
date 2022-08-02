@@ -8,7 +8,7 @@ black = "*"
 pyright = "*"
 
 [requires]
-python_version = "3.10"
+python_version = "3.9"
 
 [scripts]
 lint = "black ."
