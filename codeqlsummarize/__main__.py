@@ -92,9 +92,6 @@ def main(arguments):
         github.owner = owner
         github.repo = repo
 
-    if not os.path.exists(Generator.CODEQL_LOCATION):
-        Generator.getCodeQLRepo()
-
     if arguments.output:
         output = os.path.splitext(arguments.output)
         if output[1] != "":

@@ -29,6 +29,13 @@ jobs:
       run: |
         python -m unittest discover -v -s ./tests -p test_*.py
 
+    - name: End-2-end Tests
+      env:
+        CODEQL_TOKEN: ${{ secrets.CODEQL_TOKEN }}
+      run: |
+        ./gh-codeql-summarize --github-token $CODEQL_TOKEN -i ./examples/projects.json -f bundle --working ./examples
+
+
     # Pull Request auto-linting
     - name: Lint
       if: github.event_name == 'pull_request'
