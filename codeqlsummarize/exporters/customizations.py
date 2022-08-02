@@ -116,9 +116,9 @@ module {owner} {{
 
 def exportBundle(database: CodeQLDatabase, output: str, github: GitHub, **kargs):
     logger.debug(f"Output directory :: {output}")
-      
+
     owner = github.owner.replace("-", "_")
-    
+
     if not github or not github.owner:
         raise Exception("Failed to export Bundle: No owner / repo name set")
 

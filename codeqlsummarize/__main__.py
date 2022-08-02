@@ -27,7 +27,9 @@ parser.add_argument(
     help="Export format (`json`, `customizations`, `mad`, `bundle`)",
 )
 parser.add_argument("-i", "--input", help="Input / Project File")
-parser.add_argument("-o", "--output", default=os.getcwd(), help="Output directory / file")
+parser.add_argument(
+    "-o", "--output", default=os.getcwd(), help="Output directory / file"
+)
 
 parser.add_argument("--disable-cache", action="store_true")
 
@@ -48,9 +50,9 @@ parser_github.add_argument(
     "-t", "--github-token", default=os.environ.get("GITHUB_TOKEN")
 )
 
+
 def main(arguments):
-    """ Main workflow
-    """
+    """Main workflow"""
     github = GitHub(token=arguments.github_token)
     languages: list[str] = []
     databases: list[CodeQLDatabase] = []
@@ -107,9 +109,7 @@ def main(arguments):
         _, repo = arguments.project_repo.split("/", 1)
 
         for language in languages:
-            logger.info(
-                f"Analysing remote repo: {arguments.project_repo} ({language})"
-            )
+            logger.info(f"Analysing remote repo: {arguments.project_repo} ({language})")
 
             database = CodeQLDatabase(
                 repo, language=language, repository=arguments.project_repo
@@ -119,7 +119,9 @@ def main(arguments):
                 try:
                     database.path = database.downloadDatabase(github, temppath)
                 except Exception as err:
-                    logger.warning(f"Error encounters downloading CodeQL Database: {err}")
+                    logger.warning(
+                        f"Error encounters downloading CodeQL Database: {err}"
+                    )
             elif arguments.database:
                 logger.debug("Setting database to arguments.database ")
                 database.path = arguments.database
@@ -153,7 +155,9 @@ def main(arguments):
                             github, temppath, use_cache=not arguments.disable_cache
                         )
                     except Exception as err:
-                        logger.warning(f"Error encounters downloading CodeQL Database: {err}")
+                        logger.warning(
+                            f"Error encounters downloading CodeQL Database: {err}"
+                        )
 
                 if not db.path:
                     logger.warning(f"CodeQL Database path is not set")
@@ -181,8 +185,12 @@ def main(arguments):
         logger.info(f"Database setup complete: {database}")
 
         if not database.exists():
-            logger.warning(f"Failed to find or download the CodeQL Database for '{database.name}'")
-            logger.warning("Please to the GitHub docs to find out how to build a CodeQL Database")
+            logger.warning(
+                f"Failed to find or download the CodeQL Database for '{database.name}'"
+            )
+            logger.warning(
+                "Please to the GitHub docs to find out how to build a CodeQL Database"
+            )
             logger.warning(DOCUMENTATION.get("codeql_setup"))
             logger.warning("Skipping project until Database is avalible...")
             continue
