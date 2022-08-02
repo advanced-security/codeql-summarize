@@ -6,12 +6,6 @@ codeql/
 test.*
 *.tar*
 
-cpp/
-csharp/
-java/
-javascript/
-python/
-go/
 
 
 # Byte-compiled / optimized / DLL files
