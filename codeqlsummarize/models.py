@@ -9,7 +9,7 @@ from dataclasses import *
 from codeqlsummarize.utils import request
 
 
-CODEQL_LANGUAGES = ["java"]
+CODEQL_LANGUAGES = ["java", "csharp"]
 
 logger = logging.getLogger("codeqlsummarize.models")
 
