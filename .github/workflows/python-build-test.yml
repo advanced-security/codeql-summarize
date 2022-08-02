@@ -33,8 +33,7 @@ jobs:
       env:
         CODEQL_TOKEN: ${{ secrets.CODEQL_TOKEN }}
       run: |
-        pipenv install
-        pipenv run python -m codeqlsummarize --debug -i ./examples/projects.json -f bundle --working ./examples
+        ./gh-codeql-summarize --debug -i ./examples/projects.json -f bundle --working ./examples
 
 
     # Pull Request auto-linting
