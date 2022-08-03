@@ -31,8 +31,8 @@ parser.add_argument("-i", "--input", help="Input / Project File")
 parser.add_argument(
     "-o", "--output", default=os.getcwd(), help="Output directory / file"
 )
-
-parser.add_argument("--disable-cache", action="store_true")
+parser.add_argument("--disable-banner", action="store_true", help="Disable Banner")
+parser.add_argument("--disable-cache", action="store_true", help="Disable Caching Databases and other files")
 
 parser_codeql = parser.add_argument_group("CodeQL")
 parser_codeql.add_argument("--codeql-base", default="./codeql", help="CodeQL Base Path")
@@ -62,8 +62,8 @@ def main(arguments):
         level=logging.DEBUG if arguments.debug else logging.INFO,
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     )
-
-    print(__banner__)
+    if not arguments.disable_banner:
+        print(__banner__)
     logger.debug("Debugging is enabled")
 
     if not arguments.format:
