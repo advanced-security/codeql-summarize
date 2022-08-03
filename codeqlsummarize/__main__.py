@@ -88,8 +88,7 @@ def main(arguments):
             database=arguments.database, project_repo=arguments.project_repo
         )
 
-        if langs:
-            languages.extend(langs)
+        languages.extend(langs)
 
     if arguments.github_repository:
         owner, repo = arguments.github_repository.split("/", 1)

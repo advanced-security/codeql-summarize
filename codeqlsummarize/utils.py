@@ -69,7 +69,7 @@ def loadYaml(path: str) -> Any:
 
 def detectLanguage(
     database: str = "", project_repo: str = "", github=None
-) -> Optional[list[str]]:
+) -> List[str]:
     """Detect languages based on:
     - the database
     - the repo languages
@@ -83,7 +83,7 @@ def detectLanguage(
     if project_repo:
         # TODO: get from GitHub API languages
         pass
-    return
+    return []
 
 
 def print_to_stream(f):
