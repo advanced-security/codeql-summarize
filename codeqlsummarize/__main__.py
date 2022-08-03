@@ -171,8 +171,9 @@ def main(arguments):
     elif arguments.database:
         for language in languages:
             # find local db + language
+            name = os.path.basename(arguments.database)
             database = CodeQLDatabase(
-                "test", path=arguments.database, language=language
+                name, path=arguments.database, language=language
             )
             databases.append(database)
 
