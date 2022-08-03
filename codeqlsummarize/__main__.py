@@ -112,18 +112,18 @@ def main(arguments):
         _, repo = arguments.project_repo.split("/", 1)
 
         for language in languages:
-            logger.info(f"Analysing remote repo: {arguments.project_repo} ({language})")
+            logger.info(f"Analyzing remote repo: {arguments.project_repo} ({language})")
 
             database = CodeQLDatabase(
                 repo, language=language, repository=arguments.project_repo
             )
 
-            if github.avalible:
+            if github.available:
                 try:
                     database.path = database.downloadDatabase(github, temppath)
                 except Exception as err:
                     logger.warning(
-                        f"Error encounters downloading CodeQL Database: {err}"
+                        f"Error encountered while downloading CodeQL Database: {err}"
                     )
             elif arguments.database:
                 logger.debug("Setting database to arguments.database ")
@@ -150,7 +150,7 @@ def main(arguments):
 
                 db = CodeQLDatabase(name=name, language=lang, repository=repo)
 
-                if github.avalible and db.repository:
+                if github.available and db.repository:
                     logger.info(f"Downloading database for :: {repo}")
 
                     try:
@@ -159,7 +159,7 @@ def main(arguments):
                         )
                     except Exception as err:
                         logger.warning(
-                            f"Error encounters downloading CodeQL Database: {err}"
+                            f"Error encountered while downloading CodeQL Database: {err}"
                         )
 
                 if not db.path:
@@ -192,10 +192,10 @@ def main(arguments):
                 f"Failed to find or download the CodeQL Database for '{database.name}'"
             )
             logger.warning(
-                "Please to the GitHub docs to find out how to build a CodeQL Database"
+                "Please consult the GitHub docs to find out how to build a CodeQL Database"
             )
             logger.warning(DOCUMENTATION.get("codeql_setup"))
-            logger.warning("Skipping project until Database is avalible...")
+            logger.warning("Skipping project until Database is available...")
             continue
 
         # find codeql

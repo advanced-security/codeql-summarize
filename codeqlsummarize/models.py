@@ -34,7 +34,7 @@ class GitHub:
             logger.debug(f"GitHub Token is set")
 
     @property
-    def avalible(self):
+    def available(self):
         return self.token is not None
 
 
