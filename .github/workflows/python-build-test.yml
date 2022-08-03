@@ -31,10 +31,9 @@ jobs:
 
     - name: End-2-end Tests
       env:
-        CODEQL_TOKEN: ${{ secrets.CODEQL_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.CODEQL_TOKEN }}
       run: |
         ./gh-codeql-summarize \
-          --github-token $CODEQL_TOKEN \
           -i ./examples/projects.json \
           -f bundle \
           -o ./examples \
