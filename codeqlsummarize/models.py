@@ -34,8 +34,9 @@ class GitHub:
             logger.debug(f"GitHub Token is set")
 
     @property
-    def avalible(self):
+    def available(self):
         return self.token is not None
+
 
 @dataclass
 class CodeQLDatabase:
@@ -134,7 +135,7 @@ class CodeQLDatabase:
         # SECURITY: Do we trust this DB?
         with zipfile.ZipFile(output_zip) as zf:
             zf.extractall(output_db)
-        
+
         logger.info(f" >>> {output_db}")
         codeql_lang_path = os.path.join(output_db, self.language)
         if os.path.exists(codeql_lang_path):
@@ -144,4 +145,3 @@ class CodeQLDatabase:
             codeql_dir = os.path.join(output_db, codeql_dir)
             if os.path.isdir(codeql_dir):
                 return codeql_dir
-       
