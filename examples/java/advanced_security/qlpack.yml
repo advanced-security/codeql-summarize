@@ -1,6 +1,0 @@
-name: advanced_security/java
-version: 0.1.0
-dependencies:
-  codeql/java-all: "*"
-library: true
-extractor: java
