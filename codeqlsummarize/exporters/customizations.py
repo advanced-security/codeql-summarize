@@ -118,9 +118,9 @@ module {owner} {{
 
 def exportBundle(database: CodeQLDatabase, output: str, github: GitHub, **kargs):
     logger.debug(f"Output directory :: {output}")
-      
+
     owner = github.owner.replace("-", "_").lower()
-    
+
     if not github or not github.owner:
         raise Exception("Failed to export Bundle: No owner / repo name set")
 
@@ -173,6 +173,7 @@ def exportBundle(database: CodeQLDatabase, output: str, github: GitHub, **kargs)
         custom = custom.replace(".qll", "")
 
         impt = f"    private import {owner}.{database.language}_summarize.{custom}\n"
+
         customizations_data += impt
 
     with open(customizations_path, "w") as handle:

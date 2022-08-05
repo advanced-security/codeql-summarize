@@ -3,19 +3,15 @@
 
 import json
 import os
-from os.path import (
-  join,
-  exists,
-  realpath
-)
+from os.path import join, exists, realpath
 import shlex
 import tempfile
 import logging
 from typing import *
 from codeqlsummarize.utils import (
-  findCodeQLCli,
-  exec_from_path_env,
-  print_to_stream,
+    findCodeQLCli,
+    exec_from_path_env,
+    print_to_stream,
 )
 from codeqlsummarize import __MODULE_PATH__
 from codeqlsummarize.models import CodeQLDatabase, Summaries
@@ -40,13 +36,10 @@ class Generator:
         self.database = database
         self.codeql = findCodeQLCli()
         if not self.codeql:
-            raise Exception('Failed to find CodeQL distribution!')
+            raise Exception("Failed to find CodeQL distribution!")
 
-        self.pack_name = f'codeql/{database.language}-queries'
-        self.codeql(
-            'pack', 'download',
-            self.pack_name
-        )
+        self.pack_name = f"codeql/{database.language}-queries"
+        self.codeql("pack", "download", self.pack_name)
 
     def getModelGeneratorQuery(self, name) -> Optional[str]:
         logger.info(f"Finding query name: {name}")
@@ -63,8 +56,8 @@ class Generator:
         logger.info("Running Query :: " + query)
         resultBqrs = join(
             self.database.path,
-            'results',
-            query.replace(':', '/').replace('.ql', '.bqrs')
+            "results",
+            query.replace(":", "/").replace(".ql", ".bqrs"),
         )
 
         output_std = join(Generator.TEMP_PATH, "runquery.txt")
@@ -72,8 +65,10 @@ class Generator:
         print(f'Running query "{query}"...')
         with open(output_std, "wb") as std:
             self.codeql(
-                "database", "run-queries",
-                "--threads", "0",
+                "database",
+                "run-queries",
+                "--threads",
+                "0",
                 self.database.path,
                 query,
                 outconsumer=print_to_stream(std),
@@ -91,9 +86,12 @@ class Generator:
 
         with open(output_std, "wb") as std:
             self.codeql(
-                "bqrs", "decode",
-                "--format", "json",
-                "--output", generatedJson,
+                "bqrs",
+                "decode",
+                "--format",
+                "json",
+                "--output",
+                generatedJson,
                 bqrsFile,
                 outconsumer=print_to_stream(std),
             )
