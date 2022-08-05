@@ -1,7 +1,7 @@
 import java
 private import semmle.code.java.dataflow.ExternalFlow
 
-private class EsapiEsapiJavaLegacySinkModelCustom extends SinkModel {
+private class EsapiEsapiJavaLegacySinkModelCustom extends SinkModelCsv {
   override predicate row(string row) {
     row = [
       "org.owasp.esapi.codecs;Base64;true;decodeFileToFile;(String,String);;Argument[1];create-file;generated",
@@ -27,7 +27,7 @@ private class EsapiEsapiJavaLegacySinkModelCustom extends SinkModel {
   }
 }
 
-private class EsapiEsapiJavaLegacySourceModelCustom extends SourceModel {
+private class EsapiEsapiJavaLegacySourceModelCustom extends SourceModelCsv {
   override predicate row(string row) {
     row = [
       "org.owasp.esapi.filters;SecurityWrapperRequest;true;getParameter;(String,boolean);;ReturnValue;remote;generated",
@@ -43,7 +43,7 @@ private class EsapiEsapiJavaLegacySourceModelCustom extends SourceModel {
   }
 }
 
-private class EsapiEsapiJavaLegacySummaryModelCustom extends SummaryModel {
+private class EsapiEsapiJavaLegacySummaryModelCustom extends SummaryModelCsv {
   override predicate row(string row) {
     row = [
       "java.util;Properties;true;getProperty;(String);;Argument[-1];ReturnValue;taint;generated",

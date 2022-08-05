@@ -1,0 +1,5 @@
+---
+library: false
+name: java-summarize
+version: 0.0.1
+extractor: java

@@ -5,6 +5,7 @@ from dataclasses import asdict
 
 from codeqlsummarize.models import CodeQLDatabase, GitHub
 from codeqlsummarize.generator import QUERIES
+from codeqlsummarize.utils import findCodeQLCli
 
 logger = logging.getLogger("codeqlsummarize.exporters")
 
@@ -19,7 +20,7 @@ private import semmle.code.{language}.dataflow.ExternalFlow
 """
 
 CODEQL_CUSTOMIZATION = """\
-private class {name}{type}Custom extends {models} {{
+private class {name}{type}Custom extends {models}Csv {{
   override predicate row(string row) {{
     row = [
 {rows}
@@ -33,7 +34,7 @@ def saveQLL(
     database: CodeQLDatabase, output_customizations: str, github: GitHub, **kargs
 ):
     padding = " " * 6
-    owner = github.owner.replace("-", "_")
+    owner = github.owner.replace("-", "_").lower()
 
     models = {}
     # initially populate data
@@ -47,7 +48,7 @@ def saveQLL(
         if len(summary.rows) == 0:
             models[sname] = f"// No {sname} found\n"
             continue
-        for mad in summary.rows:
+        for mad in sorted(summary.rows):
             rows += f'{padding}"{mad}"'
 
             if len(summary.rows) > counter:
@@ -118,35 +119,37 @@ module {owner} {{
 def exportBundle(database: CodeQLDatabase, output: str, github: GitHub, **kargs):
     logger.debug(f"Output directory :: {output}")
 
-    owner = github.owner.replace("-", "_")
+    owner = github.owner.replace("-", "_").lower()
 
     if not github or not github.owner:
         raise Exception("Failed to export Bundle: No owner / repo name set")
 
+    codeql_pack_path = f"{database.language}-summarize"
+    codeql_pack_name = f"{owner}/{codeql_pack_path}"
+
     # Create root for language
-    root = os.path.join(output, database.language, owner)
-    os.makedirs(root, exist_ok=True)
-    logger.debug(f"Root for language :: {root}")
+    root = os.path.join(output, codeql_pack_path)
 
-    # Create language files
-    codeql_lang_lock = os.path.join(root, "codeql-pack.lock.yml")
-    if not os.path.exists(codeql_lang_lock):
-        logger.debug(f"Creating Language Lock file :: {codeql_lang_lock}")
-        with open(codeql_lang_lock, "w") as handle:
-            handle.write(CODEQL_LOCK.format(language=database.language))
+    codeql = findCodeQLCli()
 
-    codeql_lang_pack = os.path.join(root, "qlpack.yml")
-    if not os.path.exists(codeql_lang_pack):
-        logger.debug(f"Creating Language Pack file :: {codeql_lang_pack}")
-        with open(codeql_lang_pack, "w") as handle:
-            handle.write(
-                CODEQL_PACK.format(
-                    owner=owner, version="0.1.0", language=database.language
-                )
-            )
+    if not os.path.exists(root) and codeql:
+        logger.info("Generating CodeQL Summarize Pack")
+        codeql("pack", "init", "--version=0.0.1", "--extractor", database.language, codeql_pack_path, cwd=output)
+
+    if not os.path.exists(os.path.join(root, "qlpack.yml")):
+        raise Exception("Pack wasn't found")
+
+    # Create README
+    readme = os.path.join(root, "README.md")
+    if not os.path.exists(readme):
+        with open(readme, "w") as handle:
+            handle.write("# CodeQL Summarize Pack\n")
+
+    logger.debug(f"Root Pack Path :: {root}")
 
     # Create language subfolder (if needed)
-    sub = os.path.join(root, owner, database.language)
+    sub = os.path.join(root, owner, codeql_pack_path.replace("-", "_"))
+    logger.debug(f"Checking sub pack path exists: {sub}")
     os.makedirs(sub, exist_ok=True)
 
     name = database.display_name(owner=owner) + "Generated"
@@ -157,13 +160,20 @@ def exportBundle(database: CodeQLDatabase, output: str, github: GitHub, **kargs)
     # Dynamically update Customizations.qll
     customizations_path = os.path.join(sub, "Customizations.qll")
     customizations_data = ""
-    for custom in os.listdir(sub):
+    
+    codeql_files = os.listdir(sub)
+    if not codeql_files:
+        logger.error(f"This is a major issue and please report in the GitHub issues")
+        raise Exception("Something is really wrong here...")
+
+    for custom in codeql_files:
         if custom == "Customizations.qll":
             continue
         
         custom = custom.replace(".qll", "")
 
-        impt = f"    private import {owner}.{database.language}.{custom}\n"
+        impt = f"    private import {owner}.{database.language}_summarize.{custom}\n"
+
         customizations_data += impt
 
     with open(customizations_path, "w") as handle:

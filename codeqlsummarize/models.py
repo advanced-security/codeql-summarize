@@ -16,7 +16,7 @@ logger = logging.getLogger("codeqlsummarize.models")
 
 @dataclass
 class Summaries:
-    rows: List[str]
+    rows: List[str] = field(default_factory=list)
 
 
 @dataclass
