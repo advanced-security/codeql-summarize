@@ -133,8 +133,8 @@ def exportBundle(database: CodeQLDatabase, output: str, github: GitHub, **kargs)
     codeql = findCodeQLCli()
 
     if not os.path.exists(root) and codeql:
-        # Make dirs or codeql cli???
-        codeql("pack", "init", "--version=0.0.1", "--extractor", database.language, codeql_pack_path)
+        logger.info("Generating CodeQL Summarize Pack")
+        codeql("pack", "init", "--version=0.0.1", "--extractor", database.language, codeql_pack_path, cwd=output)
 
     if not os.path.exists(os.path.join(root, "qlpack.yml")):
         raise Exception("Pack wasn't found")
