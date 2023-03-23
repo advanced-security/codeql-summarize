@@ -24,8 +24,8 @@ parser.add_argument(
 parser.add_argument(
     "-f",
     "--format",
-    default="bundle",
-    help="Export format (`json`, `customizations`, `mad`, `bundle`)",
+    default="extensions",
+    help="Export format (`json`, `customizations`, `extensions`, `bundle`)",
 )
 parser.add_argument("-i", "--input", help="Input / Project File")
 parser.add_argument(

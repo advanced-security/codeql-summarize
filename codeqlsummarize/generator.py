@@ -23,7 +23,7 @@ logger = logging.getLogger("codeqlsummarize.generator")
 QUERIES = {
     "SinkModel": "CaptureSinkModels.ql",
     "SourceModel": "CaptureSourceModels.ql",
-    "SummaryModel": "CaptureSummaryModels.ql",
+    # "SummaryModel": "CaptureSummaryModels.ql",
 }
 
 
@@ -47,7 +47,7 @@ class Generator:
         query_file = QUERIES.get(name)
 
         if query_file:
-            return f"{self.pack_name}:utils/model-generator/{query_file}"
+            return f"{self.pack_name}:utils/modelgenerator/{query_file}"
 
         # Find in this repo
         return None

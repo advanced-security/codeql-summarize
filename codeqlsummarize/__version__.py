@@ -1,7 +1,7 @@
 
 __title__ = "CodeQL Summarize"
 __name__ = "codeqlsummarize"
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 __description__ = "GitHub CodeQL Summaries Toolkit"
 __summary__ = """\
@@ -11,7 +11,7 @@ This is the GitHub CodeQL Summarize project and Actions which allows users to ge
 __url__ = "https://github.com/advanced-security/gh-codeql-summarize"
 
 __license__ = "MIT License"
-__copyright__ = "Copyright (c) 2022, GitHub"
+__copyright__ = "Copyright (c) 2023, GitHub"
 
 __author__ = "GitHub Field Team"
 __email__ = ""

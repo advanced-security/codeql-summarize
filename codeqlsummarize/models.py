@@ -21,7 +21,7 @@ class Summaries:
 
 @dataclass
 class GitHub:
-    owner: str = "Security"
+    owner: str = "security"
     repo: str = "codeql"
 
     endpoint: ClassVar[str] = "https://api.github.com"
