@@ -14,7 +14,11 @@ inputs:
 
   format:
     description: "Exporting Format (default: bundle)"
-    default: bundle
+    default: extensions
+
+  output:
+    description: "Output Directory"
+    default: ./
 
   repository:
     description: "GitHub Repository"
@@ -35,6 +39,7 @@ runs:
       run: |
         "${{ github.action_path }}/codeql-summarize" \
           --input "${{ inputs.projects }}" \
+          --output "${{ inputs.output }}" \
           --format "${{ inputs.format }}" \
           --project-repo "${{ inputs.project }}" \
           --language "${{ inputs.language }}" \
