@@ -17,7 +17,7 @@ from codeqlsummarize.utils import detectLanguage
 logger = logging.getLogger("main")
 
 
-parser = ArgumentParser("codeql-summarize", "CodeQL Summary Generator")
+parser = ArgumentParser("codeql-summarize", "CodeQL Summarize")
 parser.add_argument(
     "--debug", action="store_true", default=bool(os.environ.get("DEBUG"))
 )
@@ -96,6 +96,10 @@ def main(arguments):
         github.owner = owner
         github.repo = repo
 
+        if not arguments.project_repo:
+            logger.debug("Setting project_repo to github_repository")
+            arguments.project_repo = arguments.github_repository
+
     if arguments.output:
         output = os.path.splitext(arguments.output)
         if output[1] != "":
@@ -146,7 +150,6 @@ def main(arguments):
         for lang, repos in projects.items():
             for repo in repos:
                 _, name = repo.split("/")
-
                 db = CodeQLDatabase(name=name, language=lang, repository=repo)
 
                 if github.available and db.repository:

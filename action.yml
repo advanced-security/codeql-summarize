@@ -1,5 +1,5 @@
-name: 'codeql-summary-generator'
-description: 'CodeQL Summary Generator'
+name: 'codeql-summarize'
+description: 'CodeQL Summarize Action'
 
 inputs:
   project:
@@ -33,7 +33,7 @@ runs:
 
     - shell: bash
       run: |
-        "${{ github.action_path }}/gh-codeql-summarize" \
+        "${{ github.action_path }}/codeql-summarize" \
           --input "${{ inputs.projects }}" \
           --format "${{ inputs.format }}" \
           --project-repo "${{ inputs.project }}" \

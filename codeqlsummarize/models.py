@@ -70,6 +70,13 @@ class CodeQLDatabase:
         return new_name.title().replace(" ", "")
 
     @property
+    def owner(self) -> Optional[str]:
+        if self.repository:
+            o, n = self.repository.split("/", 1)
+            return o
+        return
+
+    @property
     def target(self):
         return f"{self.name}.qll"
 

@@ -32,9 +32,9 @@ def exportDataExtensions(database: CodeQLDatabase, output: str, github: GitHub, 
     codeqlPack = findCodeQLPack(output, database.language)
     os.makedirs(os.path.join(codeqlPack, "generated"), exist_ok=True)
 
-    if github.owner:
-        os.makedirs(os.path.join(codeqlPack, "generated", github.owner), exist_ok=True)
-        extensions_file = os.path.join(codeqlPack, "generated", github.owner, f"{database.name}.yml")
+    if database.owner:
+        os.makedirs(os.path.join(codeqlPack, "generated", database.owner), exist_ok=True)
+        extensions_file = os.path.join(codeqlPack, "generated", database.owner, f"{database.name}.yml")
     else:
         extensions_file = os.path.join(codeqlPack, "generated", f"{database.name}.yml")
 
