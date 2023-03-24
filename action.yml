@@ -37,6 +37,7 @@ runs:
 
     - shell: bash
       run: |
+        export PYTHONPATH=${{ github.action_path }}:${{ github.action_path }}/vendor
         "${{ github.action_path }}/codeql-summarize" \
           --input "${{ inputs.projects }}" \
           --output "${{ inputs.output }}" \
