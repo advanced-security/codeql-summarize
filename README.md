@@ -10,7 +10,7 @@ The main use case for `codeqlsummarize` is to run it as an Action so the purpose
 
 ```yml
 - name: Generate CodeQL Summaries
-  uses: advanced-security/codeql-summarize@main
+  uses: advanced-security/codeql-summarize@v1
   with:
     # This file defines the projects you want to make sure to get the latest and greatest
     # summaries from.
