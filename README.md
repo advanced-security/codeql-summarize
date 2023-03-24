@@ -35,3 +35,19 @@ git clone https://github.com/advanced-security/gh-codeql-summarize.git && cd gh-
 python3 -m codeqlsummarize --help
 ```
 
+## License
+
+This project is licensed under the terms of the MIT open source license. Please refer to [MIT](./LICENSE.txt) for the full terms.
+
+## Maintainers 
+
+[CODEOWNERS](./.github/CODEOWNERS) file.
+
+## Support
+
+Please create issues for any feature requests, bugs, or documentation problems.
+
+## Acknowledgement
+
+- @GeekMasher - Author
+- @zbazztian - Major contributor
