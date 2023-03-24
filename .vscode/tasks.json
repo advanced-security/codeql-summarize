@@ -1,0 +1,39 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Generate from project file",
+            "type": "shell",
+            "command": "pipenv run python -m codeqlsummarize -o ./examples -i ./examples/projects.json",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Generate from repository",
+            "type": "shell",
+            "command": "pipenv run python -m codeqlsummarize -o ./examples -l ${input:language} -r ${input:repository}",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ],
+    "inputs": [
+        {
+            "id": "language",
+            "description": "Language",
+            "default": "all",
+            "type": "promptString"
+        },
+        {
+            "id": "repository",
+            "description": "Repository (owner/repo)",
+            "default": "[owner/repo]",
+            "type": "promptString"
+        },
+    ]
+}
