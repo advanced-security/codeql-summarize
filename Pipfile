@@ -3,6 +3,9 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 name = "pypi"
 
+[packages]
+pyyaml = "*"
+
 [dev-packages]
 black = "*"
 pyright = "*"
@@ -15,6 +18,3 @@ main = "python3 codeqlsummurize/__main__.py"
 lint = "black ."
 format = "black ."
 tests = "python -m unittest discover -v -s ./tests -p test_*.py"
-
-[packages]
-pyyaml = "*"
