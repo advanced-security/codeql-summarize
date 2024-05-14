@@ -1,4 +1,4 @@
-# gh-codeql-summarize
+# CodeQL Summarize
 
 This is the GitHub CodeQL Summarize project and Actions which allows users to generate Models as Data (MaD) from CodeQL databases.
 
