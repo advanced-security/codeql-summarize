@@ -157,12 +157,12 @@
         },
         "pyright": {
             "hashes": [
-                "sha256:8320629bb7a44ca90944ba599390162bf59307f3d9fb6e27da3b7011b8c17ae5",
-                "sha256:aeeb7ff4e0364775ef416a80111613f91a05c8e01e58ecfefc370ca0db7aed9c"
+                "sha256:56f2a3ab88c5214a451eb71d8f2792b7700434f841ea219119ade7f42ca93608",
+                "sha256:5f74cce0a795a295fb768759bbeeec62561215dea657edcaab48a932b031ddbb"
             ],
             "index": "pypi",
             "markers": "python_version >= '3.7'",
-            "version": "==1.1.393"
+            "version": "==1.1.394"
         },
         "setuptools": {
             "hashes": [
