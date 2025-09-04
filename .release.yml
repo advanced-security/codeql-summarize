@@ -1,0 +1,4 @@
+name: codeql-summarize
+repository: https://github.com/advanced-security/codeql-summarize
+version: 0.2.0
+default: true
