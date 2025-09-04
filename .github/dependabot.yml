@@ -10,7 +10,7 @@ updates:
     schedule:
       interval: "weekly"
     reviewers:
-      - "geekmasher"
+      - "advanced-security/oss-maintainers"
     groups:
       production-dependencies:
         dependency-type: "production"
@@ -22,7 +22,7 @@ updates:
     schedule:
       interval: "weekly"
     reviewers:
-      - "geekmasher"
+      - "advanced-security/oss-maintainers"
     groups:
       production-dependencies:
         dependency-type: "production"

@@ -1,5 +1,5 @@
 ---
 library: false
 name: java-summarize
-version: 0.0.1
+version: 0.2.0
 extractor: java
