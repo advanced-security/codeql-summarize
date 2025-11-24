@@ -5,7 +5,7 @@ name = "pypi"
 
 [packages]
 pyyaml = "*"
-ghastoolkit = "<=0.17"
+ghastoolkit = "<=0.18.2"
 
 [dev-packages]
 black = "*"
