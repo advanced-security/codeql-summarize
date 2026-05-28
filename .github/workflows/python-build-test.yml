@@ -23,8 +23,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install pipenv
-          pipenv install --dev
+          pip install 'pipenv==2026.6.1'
+          pipenv sync --dev
 
       - name: Run Tests
         run: |
