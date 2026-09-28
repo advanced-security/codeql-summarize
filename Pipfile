@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 pyyaml = "*"
 ghastoolkit = "<=0.18.2"
+urllib3 = "==2.7.0"
 
 [dev-packages]
 black = "*"
